@@ -17,20 +17,30 @@ export interface SkillGroup {
 
 export interface Content {
   meta: { title: string };
-  nav: { about: string; experience: string; skills: string; portfolio: string; education: string; contact: string };
+  nav: { about: string; experience: string; skills: string; portfolio: string; contact: string; openMenu: string; closeMenu: string };
   languageToggle: { label: string; switchTo: string };
   hero: {
-    headline: string;
-    location: string;
     availability: string;
+    titleStart: string;
+    titleAccent: string;
+    titleEnd: string;
+    subtitle: string;
     ctaEmail: string;
     photoAlt: string;
+    photoCaption: string;
   };
   highlights: { value: string; label: string }[];
   about: { title: string; paragraphs: string[] };
-  experience: { title: string; currentBadge: string; items: Experience[] };
+  experience: { title: string; currentBadge: string; previous: string; next: string; items: Experience[] };
   skills: { title: string; groups: SkillGroup[] };
-  portfolio: { title: string; badge: string; description: string; items: { name: string; summary: string; tags: string[] }[] };
+  portfolio: {
+    title: string;
+    note: string;
+    previous: string;
+    next: string;
+    goTo: string;
+    items: { name: string; summary: string; tags: string[] }[];
+  };
   education: {
     title: string;
     degree: string;
@@ -39,7 +49,7 @@ export interface Content {
     languagesTitle: string;
     languages: { name: string; level: string }[];
   };
-  contact: { title: string; description: string; rights: string };
+  contact: { title: string; description: string; footer: string };
 }
 
 const contactLinks = {
@@ -57,16 +67,20 @@ const en: Content = {
     experience: 'Experience',
     skills: 'Skills',
     portfolio: 'Portfolio',
-    education: 'Education',
     contact: 'Contact',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
   },
   languageToggle: { label: 'Language', switchTo: 'Mudar para português' },
   hero: {
-    headline: 'Senior Frontend Engineer | React, TypeScript & React Native | Micro-Frontends | AI-Driven Product Development',
-    location: 'São Paulo, Brazil (UTC−3)',
     availability: 'Open to remote roles with US/EU time-zone overlap',
+    titleStart: 'Senior Frontend Engineer building web & mobile products with ',
+    titleAccent: 'React',
+    titleEnd: '.',
+    subtitle: 'React, TypeScript & React Native · Micro-Frontends · AI-driven product development. Based in São Paulo, Brazil (UTC−3).',
     ctaEmail: 'Get in touch',
     photoAlt: 'Photo of James Almeida',
+    photoCaption: 'James Almeida · São Paulo',
   },
   highlights: [
     { value: '7+', label: 'years building web and mobile products' },
@@ -84,6 +98,8 @@ const en: Content = {
   experience: {
     title: 'Experience',
     currentBadge: 'Current',
+    previous: 'Previous experience',
+    next: 'Next experience',
     items: [
       {
         company: 'Hyperlocal (Avec, CrossX)',
@@ -166,8 +182,10 @@ const en: Content = {
   },
   portfolio: {
     title: 'Portfolio',
-    badge: 'Coming soon',
-    description: 'Detailed case studies of personal and freelance projects are on the way.',
+    note: 'Case studies coming soon.',
+    previous: 'Previous project',
+    next: 'Next project',
+    goTo: 'Show project',
     items: [
       {
         name: 'meu-plano',
@@ -193,9 +211,9 @@ const en: Content = {
     ],
   },
   contact: {
-    title: "Let's work together",
+    title: "Let's work together.",
     description: 'Open to remote frontend and mobile engineering roles. The best way to reach me is by email or LinkedIn.',
-    rights: 'James Almeida. Frontend Software Engineer based in São Paulo, Brazil.',
+    footer: 'Frontend Software Engineer · São Paulo, Brazil',
   },
 };
 
@@ -206,16 +224,20 @@ const pt: Content = {
     experience: 'Experiência',
     skills: 'Skills',
     portfolio: 'Portfólio',
-    education: 'Formação',
     contact: 'Contato',
+    openMenu: 'Abrir menu',
+    closeMenu: 'Fechar menu',
   },
   languageToggle: { label: 'Idioma', switchTo: 'Switch to English' },
   hero: {
-    headline: 'Engenheiro Frontend Sênior | React, TypeScript e React Native | Micro-Frontends | Desenvolvimento de Produto com IA',
-    location: 'São Paulo, Brasil (UTC−3)',
     availability: 'Disponível para vagas remotas com sobreposição de fuso EUA/Europa',
+    titleStart: 'Engenheiro Frontend Sênior construindo produtos web e mobile com ',
+    titleAccent: 'React',
+    titleEnd: '.',
+    subtitle: 'React, TypeScript e React Native · Micro-Frontends · Desenvolvimento de produto com IA. Baseado em São Paulo, Brasil (UTC−3).',
     ctaEmail: 'Entre em contato',
     photoAlt: 'Foto de James Almeida',
+    photoCaption: 'James Almeida · São Paulo',
   },
   highlights: [
     { value: '7+', label: 'anos construindo produtos web e mobile' },
@@ -233,6 +255,8 @@ const pt: Content = {
   experience: {
     title: 'Experiência',
     currentBadge: 'Atual',
+    previous: 'Experiência anterior',
+    next: 'Próxima experiência',
     items: [
       {
         company: 'Hyperlocal (Avec, CrossX)',
@@ -315,8 +339,10 @@ const pt: Content = {
   },
   portfolio: {
     title: 'Portfólio',
-    badge: 'Em breve',
-    description: 'Estudos de caso detalhados de projetos pessoais e freelance estão a caminho.',
+    note: 'Estudos de caso em breve.',
+    previous: 'Projeto anterior',
+    next: 'Próximo projeto',
+    goTo: 'Mostrar projeto',
     items: [
       {
         name: 'meu-plano',
@@ -342,9 +368,9 @@ const pt: Content = {
     ],
   },
   contact: {
-    title: 'Vamos trabalhar juntos?',
+    title: 'Vamos trabalhar juntos.',
     description: 'Aberto a vagas remotas de engenharia frontend e mobile. O melhor jeito de falar comigo é por e-mail ou LinkedIn.',
-    rights: 'James Almeida. Engenheiro de Software Frontend em São Paulo, Brasil.',
+    footer: 'Engenheiro de Software Frontend · São Paulo, Brasil',
   },
 };
 
