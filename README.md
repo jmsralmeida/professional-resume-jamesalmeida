@@ -1,21 +1,17 @@
-# 💼 Portfólio Profissional - James Almeida
+# James Almeida | Senior Frontend Engineer
 
-Portfólio pessoal desenvolvido em React + TypeScript com design responsivo e moderno. Apresenta experiência em desenvolvimento fullstack, projetos realizados e competências técnicas.
+Personal resume site built with React, TypeScript, Tailwind CSS and Vite, deployed to GitHub Pages.
 
-## 🛠️ Stack
-React • TypeScript • Tailwind CSS • Vite • Lucide React
+The site is bilingual (English and Brazilian Portuguese). A PT/EN switch in the header changes the language, and the choice is kept in `sessionStorage` for the browser session; on the first visit the browser language decides.
 
-## 🎯 Sobre
-Desenvolvedor fullstack com 4+ anos de experiência em React, Angular, Node.js e PHP. Especializado em criação de soluções digitais modernas e escaláveis.
+## Editing content
 
-## 📱 Preview
-- Design responsivo para todos os dispositivos
-- Navegação suave entre seções
-- Performance otimizada
-- SEO friendly
+All text lives in `src/i18n/content.ts`, with one object per language (`en` and `pt`). Update both when changing the resume.
 
-## �� Deploy
-Pronto para deploy em Vercel, Netlify ou qualquer plataforma de hospedagem estática.
+## Scripts
 
----
-**Contato**: james.almeida.ti@gmail.com | [LinkedIn](https://www.linkedin.com/in/jamesr-almeida/)
+- `yarn dev`: local dev server
+- `yarn build`: production build
+- `yarn lint`: ESLint
+
+**Contact:** james.almeida.ti@gmail.com | [LinkedIn](https://www.linkedin.com/in/jamesr-almeida/) | [GitHub](https://github.com/jmsralmeida)
