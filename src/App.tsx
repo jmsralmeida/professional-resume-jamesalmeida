@@ -174,7 +174,7 @@ function App() {
                 <div className="flex flex-col mobile:flex-row space-y-3 mobile:space-y-0 mobile:space-x-4">
                   <a 
                     target='_blank'
-                    href="https://github.com/jmsalmeida"
+                    href="https://github.com/jmsralmeida"
                     className="flex w-full items-center justify-center space-x-2 bg-gray-800 text-white px-4 py-3 rounded-lg hover:bg-gray-900 transition-colors duration-200"
                   >
                     <FolderGit2 size={18} />
@@ -426,7 +426,7 @@ function App() {
             <div className="flex justify-center space-x-4 mb-8">
               <a 
                 target='_blank'
-                href="https://github.com/jmsalmeida" 
+                href="https://github.com/jmsralmeida" 
                 className="text-gray-400 hover:text-white transition-colors duration-200"
                 aria-label="GitHub"
               >
