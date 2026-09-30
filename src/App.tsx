@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Menu, X } from 'lucide-react';
 
-import profileImage from './assets/images/profile.png';
+import profileImage from './assets/images/profile.jpg';
 import { contactLinks } from './i18n/content';
 import { useLanguage } from './i18n/LanguageContext';
 
