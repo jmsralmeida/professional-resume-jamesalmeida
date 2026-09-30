@@ -46,6 +46,7 @@ export interface Content {
     degree: string;
     school: string;
     year: string;
+    courses: { name: string; school: string; year: string }[];
     languagesTitle: string;
     languages: { name: string; level: string }[];
   };
@@ -86,13 +87,13 @@ const en: Content = {
     { value: '7+', label: 'years building web and mobile products' },
     { value: '~60k', label: 'daily active users on the app I rebuilt' },
     { value: '100k+', label: 'accounts migrated to a unified login' },
-    { value: '40% → 80%', label: 'test coverage on a crypto exchange UI' },
+    { value: '15 → 3 days', label: 'to ship a new white-label app, across ~300 store apps' },
   ],
   about: {
     title: 'About',
     paragraphs: [
-      'Frontend engineer with 7+ years building web and mobile products in React, TypeScript and React Native, and 10+ years in tech. I modernize legacy platforms with micro-frontend architectures, ship secure authentication (AWS Cognito, 2FA) and lead AI-assisted, spec-driven development.',
-      'Recently led an AI-assisted mobile rewrite shipped in one quarter to ~60k daily active users and migrated 100k+ accounts to a unified AWS Cognito login. Experienced with international, fully remote teams.',
+      'Frontend engineer with 7+ years building web and mobile products in React, TypeScript and React Native, and 10+ years in tech. As the only dedicated frontend engineer at a salon-tech company, I own 5+ B2B and B2C products and work directly with the product and design teams on the design system and new products.',
+      'I automated a white-label pipeline for ~300 iOS and Android apps (new-app SLA cut from 15 to 3 days), led an AI-assisted mobile rewrite shipped in one quarter to ~60k daily active users and migrated 100k+ accounts to AWS Cognito. Experienced with international, fully remote teams.',
     ],
   },
   experience: {
@@ -107,13 +108,15 @@ const en: Content = {
         period: 'Jan 2023 – Present',
         location: 'São Paulo, Brazil',
         current: true,
+        context: "Salon-tech company behind SalãoVIP, a leading salon-management platform in South and Southeast Brazil. As the team's only dedicated frontend engineer, I own the frontend of its B2B and B2C products.",
         highlights: [
+          "Own the management, evolution and production fixes of 5+ B2B and B2C products across web and mobile, ensuring cross-browser compatibility on the web apps: SalãoVIP (frontend of the legacy PHP/CodeIgniter platform, the company's largest and most profitable product), Avec Pro and Avec App (React Native), Avec Portal (Next.js), Online Booking (embedded in the portal) and the white-label apps.",
+          'Automated the white-label app pipeline for 150+ salon clients (~300 iOS and Android apps) with Expo EAS cloud builds and store submissions, automated asset swapping and icon/splash generation, and owned store credentials and integration users, cutting the new-app SLA from 15 to 3 days and letting non-engineering teams create and update apps without code.',
           'Led the AI-assisted, spec-driven rewrite of Avec Pro, a legacy AngularJS salon-management app, into a cross-platform React Native/Expo app (iOS and Android), shipped in one quarter and now serving ~60k daily active users (Spec Kit, Cursor, MCP).',
-          'Architected a micro-frontend platform with single-spa, React and TypeScript, now running 5 modules across 2 business verticals and letting teams ship new features into legacy web and mobile apps without full rewrites.',
-          'Built a unified login for the Avec and CrossX products with AWS Amplify and Cognito, migrating 100k+ user accounts to a new user pool and enforcing 2FA to meet corporate security requirements.',
-          "Delivered a receivables-advance product for commissioned professionals as a React/TypeScript micro-frontend integrated with a financial partner's API, increasing commission-advance requests throughout 2025.",
+          'Architected a micro-frontend platform with single-spa, React and TypeScript, now running 5 modules across 2 business verticals (Avec AI, subscription club, bank-account onboarding, receivables advance, user migration and Cognito login) and letting teams ship new features into legacy web and mobile apps without full rewrites.',
+          "Built a unified login for the Avec and CrossX products with AWS Amplify and Cognito, migrating 100k+ user accounts to a new user pool and enforcing 2FA to meet corporate security requirements; implemented LGPD (Brazil's GDPR) privacy requirements across the products' frontends.",
+          'Work directly with the product and design teams, joining sprint planning, backlog refinement and alignment meetings; partner with design on the design system and new products, turning Figma designs into reusable components; rebuilt the shared design system used by 2 product verticals (~40 components, icon library and theming) with Cypress visual regression tests to catch breaking UI changes before release.',
           "Built the frontend of Avec AI, a WhatsApp product for AI scheduling, appointment confirmation and marketing automation: WhatsApp connection management, Meta SDK integration and QR-code onboarding. Won the company's 2025 innovation award.",
-          'Rebuilt the shared design system used by 2 product verticals (~40 components, icon library and theming), adding Cypress visual regression tests to catch breaking UI changes before release.',
         ],
       },
       {
@@ -166,9 +169,11 @@ const en: Content = {
     groups: [
       {
         title: 'Frontend & Mobile',
-        items: ['React', 'TypeScript', 'JavaScript', 'React Native / Expo', 'Redux', 'Next.js', 'Micro-Frontends (single-spa)', 'Design Systems', 'Ember.js'],
+        items: ['React', 'TypeScript', 'JavaScript', 'HTML5', 'Advanced CSS3', 'React Native / Expo (EAS Build & Submit)', 'Redux', 'Next.js', 'Micro-Frontends (single-spa)', 'Ember.js'],
       },
-      { title: 'Cloud & Auth', items: ['AWS Amplify', 'AWS Cognito', '2FA'] },
+      { title: 'Web Quality', items: ['Advanced CSS (8 years)', 'Cross-browser compatibility', 'Responsive layouts'] },
+      { title: 'Design & UX', items: ['Design Systems', 'Figma (basic)', 'UX fundamentals', 'Close collaboration with design teams'] },
+      { title: 'Cloud, Auth & Privacy', items: ['AWS Amplify', 'AWS Cognito', '2FA', 'LGPD/GDPR-aligned privacy'] },
       { title: 'Testing & Quality', items: ['Jest', 'Cypress (E2E, visual regression)', 'CI/CD pipelines'] },
       {
         title: 'AI',
@@ -176,7 +181,7 @@ const en: Content = {
       },
       {
         title: 'Backend (working knowledge)',
-        items: ['Node.js', 'PHP', 'Ruby on Rails', 'REST APIs', 'MongoDB', 'MySQL'],
+        items: ['Node.js', 'PHP (CodeIgniter)', 'Ruby on Rails', 'REST APIs', 'MongoDB', 'MySQL'],
       },
     ],
   },
@@ -204,6 +209,7 @@ const en: Content = {
     degree: 'B.S. in Information Systems',
     school: 'Universidade de Mogi das Cruzes, Brazil',
     year: '2023',
+    courses: [{ name: 'UX Design Course (3 months)', school: 'Mastertech, São Paulo', year: '2019' }],
     languagesTitle: 'Languages',
     languages: [
       { name: 'Portuguese', level: 'Native' },
@@ -243,13 +249,13 @@ const pt: Content = {
     { value: '7+', label: 'anos construindo produtos web e mobile' },
     { value: '~60 mil', label: 'usuários ativos por dia no app que reescrevi' },
     { value: '100 mil+', label: 'contas migradas para um login unificado' },
-    { value: '40% → 80%', label: 'de cobertura de testes na interface de uma exchange' },
+    { value: '15 → 3 dias', label: 'para lançar um app white-label novo, em ~300 apps nas lojas' },
   ],
   about: {
     title: 'Sobre',
     paragraphs: [
-      'Engenheiro frontend com mais de 7 anos construindo produtos web e mobile com React, TypeScript e React Native, e mais de 10 anos em tecnologia. Modernizo plataformas legadas com arquitetura de micro-frontends, entrego autenticação segura (AWS Cognito, 2FA) e lidero desenvolvimento orientado a especificações com IA.',
-      'Recentemente liderei a reescrita de um app mobile com IA, entregue em um trimestre para ~60 mil usuários ativos por dia, e migrei mais de 100 mil contas para um login unificado com AWS Cognito. Tenho experiência em times internacionais e 100% remotos.',
+      'Engenheiro frontend com mais de 7 anos construindo produtos web e mobile com React, TypeScript e React Native, e mais de 10 anos em tecnologia. Como único engenheiro frontend dedicado de uma empresa de tecnologia para salões, sou dono de mais de 5 produtos B2B e B2C e trabalho direto com os times de produto e design no design system e em produtos novos.',
+      'Automatizei o pipeline de ~300 apps white-label para iOS e Android (SLA de um app novo caiu de 15 para 3 dias), liderei a reescrita de um app mobile com IA, entregue em um trimestre para ~60 mil usuários ativos por dia, e migrei mais de 100 mil contas para o AWS Cognito. Tenho experiência em times internacionais e 100% remotos.',
     ],
   },
   experience: {
@@ -264,13 +270,15 @@ const pt: Content = {
         period: 'Jan 2023 – atual',
         location: 'São Paulo, Brasil',
         current: true,
+        context: 'Empresa de tecnologia para salões, dona do SalãoVIP, plataforma de gestão de salões de referência no Sul e Sudeste do Brasil. Como único engenheiro frontend dedicado do time, sou dono do frontend dos produtos B2B e B2C.',
         highlights: [
+          'Faço a gestão, evolução e correção de problemas de mais de 5 produtos B2B e B2C, web e mobile, garantindo compatibilidade cross-browser nos apps web: SalãoVIP (frontend da plataforma legada em PHP/CodeIgniter, o maior e mais rentável produto da empresa), Avec Pro e App Avec (React Native), Portal Avec (Next.js), Agendamento Online (embutido no portal) e os apps white-label.',
+          'Automatizei o pipeline dos apps white-label de mais de 150 salões clientes (~300 apps iOS e Android) com builds e envio às lojas na nuvem via Expo EAS, troca automática de assets e geração de ícones e splash, além da gestão de credenciais das lojas e usuários de integração. O SLA de um app novo caiu de 15 para 3 dias, e outras áreas passaram a criar e atualizar apps sem depender de código.',
           'Liderei a reescrita do Avec Pro, app legado de gestão de salões em AngularJS, para um app multiplataforma em React Native/Expo (iOS e Android), com desenvolvimento orientado a especificações e IA (Spec Kit, Cursor, MCP). Entregue em um trimestre, hoje com ~60 mil usuários ativos por dia.',
-          'Arquitetei uma plataforma de micro-frontends com single-spa, React e TypeScript, hoje com 5 módulos em 2 verticais de negócio, permitindo lançar funcionalidades novas em apps web e mobile legados sem reescrevê-los.',
-          'Construí o login unificado dos produtos Avec e CrossX com AWS Amplify e Cognito, migrando mais de 100 mil contas para um novo user pool e aplicando 2FA para atender requisitos corporativos de segurança.',
-          'Entreguei um produto de antecipação de recebíveis para profissionais comissionados, como micro-frontend em React/TypeScript integrado à API de um parceiro financeiro, aumentando os pedidos de antecipação ao longo de 2025.',
+          'Arquitetei uma plataforma de micro-frontends com single-spa, React e TypeScript, hoje com 5 módulos em 2 verticais de negócio (Avec IA, clube de assinaturas, credenciamento de contas bancárias, antecipação de recebíveis, migração de usuários e login com Cognito), permitindo lançar funcionalidades novas em apps web e mobile legados sem reescrevê-los.',
+          'Construí o login unificado dos produtos Avec e CrossX com AWS Amplify e Cognito, migrando mais de 100 mil contas para um novo user pool e aplicando 2FA para atender requisitos corporativos de segurança; implementei os requisitos de privacidade da LGPD no frontend dos produtos.',
+          'Trabalho direto com os times de produto e design, participando de plannings, refinamentos e alinhamentos; com o design, atuo no design system e em produtos novos, transformando designs do Figma em componentes reutilizáveis; reconstruí o design system compartilhado por 2 verticais de produto (~40 componentes, biblioteca de ícones e temas), com testes de regressão visual em Cypress para barrar mudanças de UI indesejadas antes do release.',
           'Construí o frontend do Avec IA, produto de WhatsApp para agendamento com IA, confirmação de horários e automação de marketing: gestão da conexão do WhatsApp, integração com o SDK da Meta e onboarding por QR code. Vencedor do prêmio de inovação da empresa em 2025.',
-          'Reconstruí o design system compartilhado por 2 verticais de produto (~40 componentes, biblioteca de ícones e temas), com testes de regressão visual em Cypress para barrar mudanças de UI indesejadas antes do release.',
         ],
       },
       {
@@ -323,9 +331,11 @@ const pt: Content = {
     groups: [
       {
         title: 'Frontend e Mobile',
-        items: ['React', 'TypeScript', 'JavaScript', 'React Native / Expo', 'Redux', 'Next.js', 'Micro-Frontends (single-spa)', 'Design Systems', 'Ember.js'],
+        items: ['React', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3 avançado', 'React Native / Expo (EAS Build e Submit)', 'Redux', 'Next.js', 'Micro-Frontends (single-spa)', 'Ember.js'],
       },
-      { title: 'Cloud e Autenticação', items: ['AWS Amplify', 'AWS Cognito', '2FA'] },
+      { title: 'Qualidade Web', items: ['CSS avançado (8 anos)', 'Compatibilidade cross-browser', 'Layouts responsivos'] },
+      { title: 'Design e UX', items: ['Design Systems', 'Figma (básico)', 'Fundamentos de UX', 'Colaboração próxima com times de design'] },
+      { title: 'Cloud, Autenticação e Privacidade', items: ['AWS Amplify', 'AWS Cognito', '2FA', 'Privacidade e LGPD'] },
       { title: 'Testes e Qualidade', items: ['Jest', 'Cypress (E2E, regressão visual)', 'Pipelines de CI/CD'] },
       {
         title: 'IA',
@@ -333,7 +343,7 @@ const pt: Content = {
       },
       {
         title: 'Backend (conhecimento prático)',
-        items: ['Node.js', 'PHP', 'Ruby on Rails', 'APIs REST', 'MongoDB', 'MySQL'],
+        items: ['Node.js', 'PHP (CodeIgniter)', 'Ruby on Rails', 'APIs REST', 'MongoDB', 'MySQL'],
       },
     ],
   },
@@ -361,6 +371,7 @@ const pt: Content = {
     degree: 'Bacharelado em Sistemas de Informação',
     school: 'Universidade de Mogi das Cruzes, Brasil',
     year: '2023',
+    courses: [{ name: 'Curso de UX Design (3 meses)', school: 'Mastertech, São Paulo', year: '2019' }],
     languagesTitle: 'Idiomas',
     languages: [
       { name: 'Português', level: 'Nativo' },

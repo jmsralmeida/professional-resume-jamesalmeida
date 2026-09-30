@@ -298,6 +298,12 @@ function App() {
             <div className="flex flex-col gap-1.5">
               <h3 className="m-0 text-lg lg:text-xl font-semibold">{t.education.degree}</h3>
               <span className="text-base text-muted">{t.education.school} · {t.education.year}</span>
+              {t.education.courses.map(({ name, school, year }) => (
+                <div key={name} className="flex flex-col gap-1.5 mt-4">
+                  <h3 className="m-0 text-lg lg:text-xl font-semibold">{name}</h3>
+                  <span className="text-base text-muted">{school} · {year}</span>
+                </div>
+              ))}
             </div>
             <div className="flex flex-col gap-1.5">
               <h3 className="m-0 text-lg lg:text-xl font-semibold">{t.education.languagesTitle}</h3>
