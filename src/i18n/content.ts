@@ -8,6 +8,7 @@ export interface Experience {
   context?: string;
   highlights: string[];
   current?: boolean;
+  stack?: string[];
 }
 
 export interface SkillGroup {
@@ -31,14 +32,11 @@ export interface Content {
   };
   highlights: { value: string; label: string }[];
   about: { title: string; paragraphs: string[] };
-  experience: { title: string; currentBadge: string; previous: string; next: string; items: Experience[] };
-  skills: { title: string; groups: SkillGroup[] };
+  experience: { title: string; headline: string; currentBadge: string; stackLabel: string; items: Experience[] };
+  skills: { title: string; headline: string; groups: SkillGroup[] };
   portfolio: {
     title: string;
     note: string;
-    previous: string;
-    next: string;
-    goTo: string;
     items: { name: string; summary: string; tags: string[] }[];
   };
   education: {
@@ -78,7 +76,7 @@ const en: Content = {
     titleStart: 'Senior Frontend Engineer building web & mobile products with ',
     titleAccent: 'React',
     titleEnd: '.',
-    subtitle: 'React, TypeScript & React Native · Micro-Frontends · AI-driven product development. Based in São Paulo, Brazil (UTC−3).',
+    subtitle: 'React, TypeScript & React Native · Micro-Frontends · AI-Driven Development. Based in São Paulo, Brazil (UTC−3).',
     ctaEmail: 'Get in touch',
     photoAlt: 'Photo of James Almeida',
     photoCaption: 'James Almeida · São Paulo',
@@ -98,9 +96,9 @@ const en: Content = {
   },
   experience: {
     title: 'Experience',
+    headline: '10+ years in tech, 7+ building products.',
     currentBadge: 'Current',
-    previous: 'Previous experience',
-    next: 'Next experience',
+    stackLabel: 'Stack',
     items: [
       {
         company: 'Hyperlocal (Avec, CrossX)',
@@ -108,6 +106,7 @@ const en: Content = {
         period: 'Jan 2023 – Present',
         location: 'São Paulo, Brazil',
         current: true,
+        stack: ['React', 'TypeScript', 'React Native/Expo (EAS)', 'Next.js', 'PHP/CodeIgniter', 'single-spa', 'AWS Amplify', 'AWS Cognito', 'Cypress', 'Figma', 'Spec Kit', 'Cursor', 'MCP'],
         context: "Salon-tech company behind SalãoVIP, a leading salon-management platform in South and Southeast Brazil. As the team's only dedicated frontend engineer, I own the frontend of its B2B and B2C products.",
         highlights: [
           "Own the management, evolution and production fixes of 5+ B2B and B2C products across web and mobile, ensuring cross-browser compatibility on the web apps: SalãoVIP (frontend of the legacy PHP/CodeIgniter platform, the company's largest and most profitable product), Avec Pro and Avec App (React Native), Avec Portal (Next.js), Online Booking (embedded in the portal) and the white-label apps.",
@@ -124,6 +123,7 @@ const en: Content = {
         role: 'Frontend Software Engineer',
         period: 'Aug 2022 – Dec 2022',
         location: 'Remote',
+        stack: ['React', 'TypeScript', 'Redux', 'Jest'],
         context: 'Crypto wallet and exchange ecosystem headquartered in Tallinn, Estonia (4M+ app downloads, 100+ employees worldwide).',
         highlights: [
           "Doubled automated test coverage of the exchange's trading interface from 40% to 80% with Jest, validating and rewriting tests before the refactor to protect critical trading flows.",
@@ -136,6 +136,7 @@ const en: Content = {
         role: 'Frontend Software Engineer',
         period: 'Nov 2018 – Sep 2022',
         location: 'São Paulo, Brazil',
+        stack: ['Ember.js', 'JavaScript', 'WebSockets', 'Ruby on Rails', 'Automated testing', 'Agile'],
         context: 'Industrial machining marketplace startup; one of 3 engineers on the tech team (with the CTO and a senior engineer).',
         highlights: [
           'Built the end-to-end production dashboard with Ember.js and WebSockets (quotation, digital kanban tracking, delivery), handling ~1,000 machining quote requests per month across a network of 1,000+ registered supplier machines.',
@@ -166,6 +167,7 @@ const en: Content = {
   },
   skills: {
     title: 'Skills',
+    headline: 'The tools I ship with.',
     groups: [
       {
         title: 'Frontend & Mobile',
@@ -177,7 +179,7 @@ const en: Content = {
       { title: 'Testing & Quality', items: ['Jest', 'Cypress (E2E, visual regression)', 'CI/CD pipelines'] },
       {
         title: 'AI',
-        items: ['Spec-driven development', 'Cursor', 'MCP', 'LLM integrations (OpenAI)', 'WhatsApp Business / Meta SDK'],
+        items: ['Claude Code', 'Multi-agent orchestration', 'Spec-driven development', 'Cursor', 'MCP', 'LLM integrations (OpenAI)', 'WhatsApp Business / Meta SDK'],
       },
       {
         title: 'Backend (working knowledge)',
@@ -188,9 +190,6 @@ const en: Content = {
   portfolio: {
     title: 'Portfolio',
     note: 'Case studies coming soon.',
-    previous: 'Previous project',
-    next: 'Next project',
-    goTo: 'Show project',
     items: [
       {
         name: 'meu-plano',
@@ -213,7 +212,7 @@ const en: Content = {
     languagesTitle: 'Languages',
     languages: [
       { name: 'Portuguese', level: 'Native' },
-      { name: 'English', level: 'B2, professional working proficiency' },
+      { name: 'English', level: 'B2 (upper-intermediate), professional working proficiency' },
     ],
   },
   contact: {
@@ -240,7 +239,7 @@ const pt: Content = {
     titleStart: 'Engenheiro Frontend Sênior construindo produtos web e mobile com ',
     titleAccent: 'React',
     titleEnd: '.',
-    subtitle: 'React, TypeScript e React Native · Micro-Frontends · Desenvolvimento de produto com IA. Baseado em São Paulo, Brasil (UTC−3).',
+    subtitle: 'React, TypeScript e React Native · Micro-Frontends · Desenvolvimento com IA. Baseado em São Paulo, Brasil (UTC−3).',
     ctaEmail: 'Entre em contato',
     photoAlt: 'Foto de James Almeida',
     photoCaption: 'James Almeida · São Paulo',
@@ -260,9 +259,9 @@ const pt: Content = {
   },
   experience: {
     title: 'Experiência',
+    headline: 'Mais de 10 anos em tecnologia, 7+ construindo produtos.',
     currentBadge: 'Atual',
-    previous: 'Experiência anterior',
-    next: 'Próxima experiência',
+    stackLabel: 'Stack',
     items: [
       {
         company: 'Hyperlocal (Avec, CrossX)',
@@ -270,6 +269,7 @@ const pt: Content = {
         period: 'Jan 2023 – atual',
         location: 'São Paulo, Brasil',
         current: true,
+        stack: ['React', 'TypeScript', 'React Native/Expo (EAS)', 'Next.js', 'PHP/CodeIgniter', 'single-spa', 'AWS Amplify', 'AWS Cognito', 'Cypress', 'Figma', 'Spec Kit', 'Cursor', 'MCP'],
         context: 'Empresa de tecnologia para salões, dona do SalãoVIP, plataforma de gestão de salões de referência no Sul e Sudeste do Brasil. Como único engenheiro frontend dedicado do time, sou dono do frontend dos produtos B2B e B2C.',
         highlights: [
           'Faço a gestão, evolução e correção de problemas de mais de 5 produtos B2B e B2C, web e mobile, garantindo compatibilidade cross-browser nos apps web: SalãoVIP (frontend da plataforma legada em PHP/CodeIgniter, o maior e mais rentável produto da empresa), Avec Pro e App Avec (React Native), Portal Avec (Next.js), Agendamento Online (embutido no portal) e os apps white-label.',
@@ -286,6 +286,7 @@ const pt: Content = {
         role: 'Engenheiro de Software Frontend',
         period: 'Ago 2022 – Dez 2022',
         location: 'Remoto',
+        stack: ['React', 'TypeScript', 'Redux', 'Jest'],
         context: 'Ecossistema de carteira e exchange de criptoativos com sede em Tallinn, Estônia (4 mi+ de downloads, 100+ funcionários no mundo).',
         highlights: [
           'Dobrei a cobertura de testes automatizados da interface de negociação da exchange, de 40% para 80% com Jest, validando e reescrevendo os testes antes da refatoração para proteger os fluxos críticos.',
@@ -298,6 +299,7 @@ const pt: Content = {
         role: 'Engenheiro de Software Frontend',
         period: 'Nov 2018 – Set 2022',
         location: 'São Paulo, Brasil',
+        stack: ['Ember.js', 'JavaScript', 'WebSockets', 'Ruby on Rails', 'Testes automatizados', 'Agile'],
         context: 'Startup de marketplace de usinagem industrial; um dos 3 engenheiros do time de tecnologia (com o CTO e um engenheiro sênior).',
         highlights: [
           'Construí o dashboard de produção de ponta a ponta com Ember.js e WebSockets (orçamento, kanban digital, entrega), com ~1.000 pedidos de orçamento de usinagem por mês em uma rede de mais de 1.000 máquinas de fornecedores cadastradas.',
@@ -328,6 +330,7 @@ const pt: Content = {
   },
   skills: {
     title: 'Skills',
+    headline: 'As ferramentas com que eu entrego.',
     groups: [
       {
         title: 'Frontend e Mobile',
@@ -339,7 +342,7 @@ const pt: Content = {
       { title: 'Testes e Qualidade', items: ['Jest', 'Cypress (E2E, regressão visual)', 'Pipelines de CI/CD'] },
       {
         title: 'IA',
-        items: ['Desenvolvimento orientado a especificações', 'Cursor', 'MCP', 'Integrações com LLMs (OpenAI)', 'WhatsApp Business / SDK da Meta'],
+        items: ['Claude Code', 'Orquestração multiagente', 'Desenvolvimento orientado a especificações', 'Cursor', 'MCP', 'Integrações com LLMs (OpenAI)', 'WhatsApp Business / SDK da Meta'],
       },
       {
         title: 'Backend (conhecimento prático)',
@@ -350,9 +353,6 @@ const pt: Content = {
   portfolio: {
     title: 'Portfólio',
     note: 'Estudos de caso em breve.',
-    previous: 'Projeto anterior',
-    next: 'Próximo projeto',
-    goTo: 'Mostrar projeto',
     items: [
       {
         name: 'meu-plano',
@@ -375,7 +375,7 @@ const pt: Content = {
     languagesTitle: 'Idiomas',
     languages: [
       { name: 'Português', level: 'Nativo' },
-      { name: 'Inglês', level: 'B2, proficiência profissional' },
+      { name: 'Inglês', level: 'B2 (intermediário avançado), proficiência profissional' },
     ],
   },
   contact: {
