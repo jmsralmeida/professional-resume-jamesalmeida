@@ -1,335 +1,470 @@
-import { useState, type ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Menu, X } from 'lucide-react';
+import { useState, type KeyboardEvent, type ReactNode } from 'react';
+import { ArrowUpRight, ChevronRight, Menu, X } from 'lucide-react';
 
 import profileImage from './assets/images/profile.jpg';
 import { contactLinks } from './i18n/content';
 import { useLanguage } from './i18n/LanguageContext';
+import { CountUp, Reveal, useActiveSection, useInView, useScrollProgress, useScrolled } from './motion';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-const container = 'max-w-[1200px] mx-auto px-5 lg:px-10';
+const container = 'max-w-[72.5rem] mx-auto px-5 sm:px-8';
+const sectionOffset = 'scroll-mt-14';
 
-function SectionLabel({ children }: { children: ReactNode }) {
-  return <h2 className="m-0 font-mono font-medium text-[13px] lg:text-sm tracking-[0.06em] uppercase text-accent">{children}</h2>;
+function Eyebrow({ children }: { children: ReactNode }) {
+  return <p className="m-0 text-[0.9375rem] sm:text-[1.0625rem] font-semibold text-accent">{children}</p>;
 }
 
-function RoundButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
+function SectionTitle({ eyebrow, children }: { eyebrow: string; children: ReactNode }) {
   return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className="w-11 h-11 flex items-center justify-center rounded-full border border-line text-ink hover:border-ink transition-colors"
-    >
-      {children}
-    </button>
+    <Reveal className="flex flex-col gap-2 sm:gap-3 mb-10 sm:mb-14">
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 className="m-0 text-[2.125rem] sm:text-[3rem] lg:text-[3.5rem] font-semibold leading-[1.07] tracking-[-0.025em]">{children}</h2>
+    </Reveal>
   );
 }
 
 function LanguageSwitch() {
-  const { language, toggleLanguage, t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
+  const options = [
+    { id: 'en', label: 'EN' },
+    { id: 'pt', label: 'PT' },
+  ] as const;
 
   return (
-    <button
-      type="button"
-      onClick={toggleLanguage}
-      aria-label={t.languageToggle.switchTo}
-      className="h-11 px-3.5 rounded-full border border-line font-mono text-xs lg:text-[13px] text-muted hover:border-ink transition-colors"
-    >
-      <span className={language === 'en' ? 'text-ink font-medium' : ''}>EN</span>
-      {' / '}
-      <span className={language === 'pt' ? 'text-ink font-medium' : ''}>PT</span>
-    </button>
+    <div role="group" aria-label={t.languageToggle.label} className="relative flex p-0.5 rounded-full bg-ink/[0.06]">
+      <span
+        aria-hidden="true"
+        className={`absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-card shadow-sm transition-transform duration-300 ease-spring ${
+          language === 'pt' ? 'translate-x-full' : 'translate-x-0'
+        }`}
+      />
+      {options.map(({ id, label }) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => setLanguage(id)}
+          aria-pressed={language === id}
+          className={`relative z-10 w-10 h-7 text-xs font-semibold transition-colors ${language === id ? 'text-ink' : 'text-muted hover:text-ink'}`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Apple-style statement: words light up as the paragraph scrolls through the viewport. */
+function ScrollLitText({ text }: { text: string }) {
+  const { ref, progress } = useScrollProgress<HTMLParagraphElement>();
+  const words = text.split(' ');
+  const lit = progress * words.length * 1.15;
+
+  return (
+    <p ref={ref} className="m-0 text-[1.625rem] sm:text-[2.25rem] lg:text-[2.75rem] font-semibold leading-[1.18] tracking-[-0.02em]">
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {words.map((word, index) => (
+          <span key={`${word}-${index}`} className={`transition-colors duration-300 ${index < lit ? 'text-ink' : 'text-ink/20'}`}>
+            {word}{' '}
+          </span>
+        ))}
+      </span>
+    </p>
+  );
+}
+
+function Highlights() {
+  const { t } = useLanguage();
+  const { ref, inView } = useInView<HTMLDListElement>(0.3);
+
+  return (
+    <dl ref={ref} className="m-0 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {t.highlights.map(({ value, label }, index) => (
+        <Reveal key={label} delay={index * 90} className="flex flex-col gap-2 p-5 sm:p-7 rounded-[22px] sm:rounded-[28px] bg-card">
+          <dd className="m-0 order-1 text-[1.75rem] sm:text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.03em] text-gradient">
+            <CountUp value={value} active={inView} />
+          </dd>
+          <dt className="order-2 text-sm sm:text-[0.9375rem] leading-snug text-muted">{label}</dt>
+        </Reveal>
+      ))}
+    </dl>
+  );
+}
+
+function Experience() {
+  const { t } = useLanguage();
+  const [jobIndex, setJobIndex] = useState(0);
+  const jobs = t.experience.items;
+  const job = jobs[jobIndex];
+
+  // Arrow keys move between roles, like a native segmented control
+  const onTabKey = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const forward = event.key === 'ArrowRight' || event.key === 'ArrowDown';
+    const back = event.key === 'ArrowLeft' || event.key === 'ArrowUp';
+    if (!forward && !back) return;
+    event.preventDefault();
+    const next = (index + (forward ? 1 : -1) + jobs.length) % jobs.length;
+    setJobIndex(next);
+    const tab = document.getElementById(`job-tab-${next}`);
+    tab?.focus();
+    tab?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  };
+
+  return (
+    <div className="grid gap-6 lg:gap-12 grid-cols-[minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)] items-start">
+      <Reveal className="min-w-0 lg:sticky lg:top-24 -mx-5 sm:mx-0">
+        <div role="tablist" aria-label={t.experience.title} className="flex lg:flex-col gap-2 overflow-x-auto px-5 sm:px-0 pb-1 [scrollbar-width:none]">
+          {jobs.map((item, index) => {
+            const active = index === jobIndex;
+            return (
+              <button
+                key={item.company}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                id={`job-tab-${index}`}
+                aria-controls="job-panel"
+                tabIndex={active ? 0 : -1}
+                onClick={() => setJobIndex(index)}
+                onKeyDown={(event) => onTabKey(event, index)}
+                className={`shrink-0 flex flex-col items-start gap-0.5 px-4 py-2.5 lg:px-5 lg:py-4 rounded-full lg:rounded-2xl text-left whitespace-nowrap lg:whitespace-normal transition-[transform,background-color,color,box-shadow] duration-300 ease-spring active:scale-[0.97] active:duration-100 ${
+                  active ? 'bg-ink text-canvas lg:bg-alt lg:text-ink lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]' : 'bg-alt lg:bg-transparent text-muted hover:text-ink'
+                }`}
+              >
+                <span className="text-[0.9375rem] lg:text-[1.0625rem] font-semibold">
+                  <span className="lg:hidden">{item.company.split(' (')[0]}</span>
+                  <span className="hidden lg:inline">{item.company}</span>
+                </span>
+                <span className="hidden lg:block text-[0.8125rem] text-muted">{item.period}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Reveal>
+
+      <Reveal>
+        <article key={`${t.meta.title}-${jobIndex}`} id="job-panel" role="tabpanel" aria-labelledby={`job-tab-${jobIndex}`} className="panel-enter p-6 sm:p-10 rounded-[28px] bg-alt">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-2 text-[0.8125rem] sm:text-sm text-muted">
+            <span>{job.period}</span>
+            <span aria-hidden="true">·</span>
+            <span>{job.location}</span>
+            {job.current && (
+              <span className="px-2.5 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">{t.experience.currentBadge}</span>
+            )}
+          </div>
+          <h3 className="m-0 text-[1.625rem] sm:text-[2.125rem] font-semibold leading-[1.12] tracking-[-0.02em]">{job.company}</h3>
+          <p className="mt-1 mb-0 text-[1.0625rem] sm:text-[1.1875rem] font-medium text-muted">{job.role}</p>
+          {job.context && <p className="mt-5 mb-0 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted">{job.context}</p>}
+          <ul className="mt-6 mb-0 p-0 list-none flex flex-col gap-4 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed">
+            {job.highlights.map((highlight) => (
+              <li key={highlight} className="relative pl-5">
+                <span aria-hidden="true" className="absolute left-0 top-[0.62em] w-1.5 h-1.5 rounded-full bg-accent" />
+                {highlight}
+              </li>
+            ))}
+          </ul>
+          {job.stack && (
+            <div className="mt-8 pt-6 border-t border-line">
+              <h4 className="m-0 mb-3 text-[0.8125rem] font-semibold text-muted">{t.experience.stackLabel}</h4>
+              <ul className="m-0 p-0 list-none flex flex-wrap gap-2">
+                {job.stack.map((tag) => (
+                  <li key={tag} className="px-3 py-1 rounded-full bg-card text-[0.8125rem] font-medium">{tag}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </article>
+      </Reveal>
+    </div>
   );
 }
 
 function App() {
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [jobIndex, setJobIndex] = useState(0);
-  const [projectIndex, setProjectIndex] = useState(0);
-
-  const jobs = t.experience.items;
-  const job = jobs[jobIndex];
-  const projects = t.portfolio.items;
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const jobPosition = `${pad(jobIndex + 1)} / ${pad(jobs.length)}`;
-  const prevJob = () => setJobIndex((i) => (i - 1 + jobs.length) % jobs.length);
-  const nextJob = () => setJobIndex((i) => (i + 1) % jobs.length);
-  const prevProject = () => setProjectIndex((i) => (i - 1 + projects.length) % projects.length);
-  const nextProject = () => setProjectIndex((i) => (i + 1) % projects.length);
+  const scrolled = useScrolled();
 
   const navItems = [
     { id: 'about', label: t.nav.about },
+    { id: 'projects', label: t.nav.projects },
     { id: 'experience', label: t.nav.experience },
     { id: 'skills', label: t.nav.skills },
-    { id: 'portfolio', label: t.nav.portfolio },
     { id: 'contact', label: t.nav.contact },
   ];
+  const activeSection = useActiveSection(navItems.map(({ id }) => id));
+  const [firstParagraph, ...otherParagraphs] = t.about.paragraphs;
 
   return (
-    <div className="min-h-screen bg-paper text-ink font-sans text-[17px] leading-relaxed">
-      <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur border-b border-line">
-        <div className={`${container} h-[68px] lg:h-[100px] flex items-center justify-between gap-4`}>
-          <a href="#top" className="font-serif text-[21px] lg:text-2xl font-medium tracking-[-0.01em]">James Almeida</a>
-          <nav className="hidden lg:flex items-center gap-9 text-[15px]">
+    <div className="min-h-screen bg-canvas text-ink font-sans text-[1.0625rem] leading-normal">
+      {/* Frosted glass navigation */}
+      <header
+        data-material={scrolled || menuOpen ? 'on' : 'off'}
+        className="nav-material fixed inset-x-0 top-0 z-50"
+      >
+        <div className={`${container} h-14 flex items-center justify-between gap-4`}>
+          <a href="#top" className="text-[1.0625rem] font-semibold tracking-[-0.01em]">James Almeida</a>
+          <nav className="hidden md:flex items-center gap-7 text-[0.8125rem]">
             {navItems.map(({ id, label }) => (
-              <a key={id} href={`#${id}`} className="hover:text-accent transition-colors">{label}</a>
+              <a
+                key={id}
+                href={`#${id}`}
+                aria-current={activeSection === id ? 'true' : undefined}
+                className={`font-medium transition-colors ${activeSection === id ? 'text-ink' : 'text-ink/65 hover:text-ink'}`}
+              >
+                {label}
+              </a>
             ))}
             <LanguageSwitch />
           </nav>
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-2">
             <LanguageSwitch />
-            <RoundButton label={menuOpen ? t.nav.closeMenu : t.nav.openMenu} onClick={() => setMenuOpen((open) => !open)}>
-              {menuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
-            </RoundButton>
+            <button
+              type="button"
+              aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((open) => !open)}
+              className="w-10 h-10 -mr-2 flex items-center justify-center"
+            >
+              {menuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+            </button>
           </div>
         </div>
-        {menuOpen && (
-          <nav className="lg:hidden absolute inset-x-0 top-full flex flex-col px-5 pt-2 pb-5 bg-paper border-b border-line text-xl">
+        <nav
+          className={`menu-sheet md:hidden absolute inset-x-0 top-full origin-top transition-[opacity,transform,visibility] duration-300 ease-spring ${
+            menuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-3 invisible'
+          }`}
+          aria-hidden={!menuOpen}
+        >
+          <div className="flex flex-col px-5 pb-6 pt-1">
             {navItems.map(({ id, label }) => (
-              <a key={id} href={`#${id}`} onClick={() => setMenuOpen(false)} className="py-3">{label}</a>
+              <a
+                key={id}
+                href={`#${id}`}
+                tabIndex={menuOpen ? 0 : -1}
+                onClick={() => setMenuOpen(false)}
+                className="py-3 text-[1.5rem] font-semibold tracking-[-0.01em] border-b border-line/60 last:border-0"
+              >
+                {label}
+              </a>
             ))}
-          </nav>
-        )}
+          </div>
+        </nav>
       </header>
 
       <main id="top">
         {/* Hero */}
-        <section className={`${container} grid gap-6 lg:gap-24 lg:grid-cols-[minmax(0,1fr)_420px] items-center pt-7 pb-10 lg:pt-[104px] lg:pb-24`}>
-          <div className="flex flex-col gap-6 lg:gap-8 order-2 lg:order-1">
-            <p className="m-0 flex items-start lg:items-center gap-2.5 font-mono text-[13px] lg:text-sm leading-normal text-muted">
-              <span className="shrink-0 w-2 h-2 mt-1.5 lg:mt-0 rounded-full bg-accent" aria-hidden="true" />
-              {t.hero.availability}
-            </p>
-            <h1 className="m-0 font-serif font-normal text-[42px] lg:text-[76px] leading-[1.06] lg:leading-[1.04] tracking-[-0.02em]">
-              {t.hero.titleStart}
-              <span className="text-accent italic">{t.hero.titleAccent}</span>
-              {t.hero.titleEnd}
-            </h1>
-            <p className="m-0 max-w-[620px] text-base lg:text-[19px] text-muted">{t.hero.subtitle}</p>
-            <div className="flex flex-col sm:flex-row gap-2.5 lg:gap-3 pt-0 lg:pt-2">
+        <section className={`${container} grid gap-10 lg:gap-16 lg:grid-cols-[minmax(0,1fr)_380px] items-center pt-24 pb-16 sm:pt-32 lg:pt-40 lg:pb-28`}>
+          <div className="flex flex-col gap-5 sm:gap-6 order-2 lg:order-1">
+            <Reveal>
+              <p className="m-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-alt text-[0.8125rem] sm:text-sm font-medium text-muted">
+                <span className="relative flex w-2 h-2" aria-hidden="true">
+                  <span className="absolute inset-0 rounded-full bg-[#30d158] animate-ping opacity-60 motion-reduce:animate-none" />
+                  <span className="relative w-2 h-2 rounded-full bg-[#30d158]" />
+                </span>
+                {t.hero.availability}
+              </p>
+            </Reveal>
+            <Reveal delay={80}>
+              <h1 className="m-0 text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem] font-bold leading-[1.05] tracking-[-0.035em]">
+                {t.hero.titleStart}
+                <span className="text-gradient">{t.hero.titleAccent}</span>
+                {t.hero.titleEnd}
+              </h1>
+            </Reveal>
+            <Reveal delay={160}>
+              <p className="m-0 max-w-[37.5rem] text-[1.1875rem] sm:text-[1.3125rem] leading-[1.45] text-muted">{t.hero.subtitle}</p>
+            </Reveal>
+            <Reveal delay={240} className="flex flex-wrap items-center gap-x-5 sm:gap-x-6 gap-y-4 pt-2">
               <a
                 href={`mailto:${contactLinks.email}`}
-                className="flex items-center justify-center gap-2.5 h-[52px] px-[26px] rounded-full bg-accent hover:bg-accent-hover text-white font-medium text-base transition-colors"
+                className="inline-flex items-center justify-center h-12 px-6 rounded-full bg-accent hover:bg-accent-hover text-white text-[1.0625rem] font-medium transition-[transform,background-color] duration-100 ease-out active:scale-[0.97]"
               >
                 {t.hero.ctaEmail}
-                <ArrowRight size={16} aria-hidden="true" />
               </a>
-              <div className="grid grid-cols-2 sm:flex gap-2.5 lg:gap-3">
-                <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center justify-center h-12 sm:h-[52px] px-[22px] rounded-full border border-line hover:border-ink text-base transition-colors">
-                  LinkedIn
-                </a>
-                <a href={contactLinks.github} target="_blank" rel="noreferrer" className="flex items-center justify-center h-12 sm:h-[52px] px-[22px] rounded-full border border-line hover:border-ink text-base transition-colors">
-                  GitHub
-                </a>
-              </div>
-            </div>
+              <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-accent hover:underline">
+                LinkedIn
+                <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </a>
+              <a href={contactLinks.github} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-accent hover:underline">
+                GitHub
+                <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </a>
+            </Reveal>
           </div>
-          <figure className="m-0 flex flex-col gap-3 order-1 lg:order-2">
+          <Reveal variant="scale" delay={120} className="order-1 lg:order-2 w-[200px] sm:w-[280px] lg:w-auto">
             <img
               src={profileImage}
               alt={t.hero.photoAlt}
-              width={420}
-              height={520}
-              className="w-full aspect-[35/38] lg:aspect-[4/5] rounded-[18px] lg:rounded-[20px] object-cover object-top bg-line"
+              width={400}
+              height={500}
+              className="w-full aspect-[4/5] rounded-[28px] lg:rounded-[32px] object-cover object-top bg-alt shadow-[0_30px_80px_-20px_rgba(0,0,0,0.25)]"
             />
-            <figcaption className="hidden lg:block font-mono text-[13px] text-muted">{t.hero.photoCaption}</figcaption>
-          </figure>
+          </Reveal>
         </section>
 
         {/* Highlights */}
-        <section className={container}>
-          <dl className="m-0 grid grid-cols-2 lg:grid-cols-4 gap-x-5 lg:gap-x-0 border-b lg:border-t border-line">
-            {t.highlights.map(({ value, label }) => (
-              <div key={label} className="flex flex-col-reverse justify-end gap-1 lg:gap-1.5 py-5 lg:py-9 lg:px-8 lg:first:pl-0 lg:last:pr-0 border-t lg:border-t-0 lg:border-l lg:first:border-l-0 border-line">
-                <dt className="text-sm lg:text-[15px] leading-snug text-muted">{label}</dt>
-                <dd className="m-0 font-serif text-[34px] lg:text-5xl leading-[1.1]">{value}</dd>
-              </div>
-            ))}
-          </dl>
+        <section className="bg-alt py-16 sm:py-24">
+          <div className={container}>
+            <Highlights />
+          </div>
         </section>
 
         {/* About */}
-        <section id="about" className={`${container} scroll-mt-[68px] lg:scroll-mt-[100px] grid gap-4 lg:gap-16 lg:grid-cols-[280px_minmax(0,1fr)] pt-14 pb-6 lg:pt-28 lg:pb-16`}>
-          <SectionLabel>{t.about.title}</SectionLabel>
-          <div className="flex flex-col gap-4 lg:gap-5 max-w-[820px]">
-            {t.about.paragraphs.map((paragraph, index) => (
-              <p
-                key={paragraph}
-                className={index === 0 ? 'm-0 font-serif text-[22px] lg:text-[30px] leading-[1.4] lg:leading-[1.35]' : 'm-0 text-base lg:text-lg text-muted'}
-              >
-                {paragraph}
-              </p>
+        <section id="about" className={`${container} ${sectionOffset} py-20 sm:py-32`}>
+          <Reveal className="mb-6 sm:mb-8">
+            <Eyebrow>{t.about.title}</Eyebrow>
+          </Reveal>
+          <div className="flex flex-col gap-8 max-w-[57.5rem]">
+            <ScrollLitText text={firstParagraph} />
+            {otherParagraphs.map((paragraph) => (
+              <Reveal key={paragraph}>
+                <p className="m-0 max-w-[45rem] text-[1.0625rem] sm:text-[1.3125rem] leading-[1.5] text-muted">{paragraph}</p>
+              </Reveal>
             ))}
+          </div>
+        </section>
+
+        {/* Key projects */}
+        <section id="projects" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
+          <div className={container}>
+            <SectionTitle eyebrow={t.projects.title}>{t.projects.headline}</SectionTitle>
+            <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+              {t.projects.items.map((project, index) => (
+                <Reveal key={project.name} delay={index * 90} className="flex flex-col gap-4 p-7 sm:p-9 rounded-[28px] bg-card">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[0.8125rem] font-semibold text-accent">{project.company}</span>
+                    <h3 className="m-0 text-[1.5rem] sm:text-[1.75rem] font-semibold leading-[1.15] tracking-[-0.02em]">{project.name}</h3>
+                  </div>
+                  <p className="m-0 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted">{project.summary}</p>
+                  <ul className="mt-auto pt-2 mb-0 p-0 list-none flex flex-wrap gap-2">
+                    {project.stack.map((tag) => (
+                      <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[0.8125rem] font-medium">{tag}</li>
+                    ))}
+                  </ul>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* Experience */}
-        <section id="experience" className="scroll-mt-[68px] lg:scroll-mt-[100px] py-10 lg:py-16">
-          <div className={`${container} flex items-center justify-between mb-4 lg:mb-10`}>
-            <SectionLabel>{t.experience.title}</SectionLabel>
-            <div className="hidden lg:flex items-center gap-3">
-              <RoundButton label={t.experience.previous} onClick={prevJob}><ArrowLeft size={16} aria-hidden="true" /></RoundButton>
-              <span className="min-w-16 text-center font-mono text-[13px] text-muted">{jobPosition}</span>
-              <RoundButton label={t.experience.next} onClick={nextJob}><ArrowRight size={16} aria-hidden="true" /></RoundButton>
-            </div>
-          </div>
-          <div className="lg:max-w-[1200px] lg:mx-auto lg:px-10 grid gap-4 lg:gap-16 lg:grid-cols-[320px_minmax(0,1fr)]">
-            <div className="flex lg:flex-col gap-2 lg:gap-1.5 overflow-x-auto px-5 lg:px-0 pb-1 lg:pb-0 [scrollbar-width:none]">
-              {jobs.map((item, index) => {
-                const active = index === jobIndex;
-                return (
-                  <button
-                    key={item.company}
-                    type="button"
-                    onClick={() => setJobIndex(index)}
-                    aria-current={active ? 'true' : undefined}
-                    className={`shrink-0 flex flex-col items-start gap-0.5 h-10 lg:h-auto lg:min-h-11 justify-center px-3.5 lg:px-5 lg:py-4 rounded-full lg:rounded-xl border text-left whitespace-nowrap lg:whitespace-normal transition-colors ${
-                      active ? 'bg-surface border-line text-ink' : 'bg-transparent border-line lg:border-transparent text-muted hover:text-ink'
-                    }`}
-                  >
-                    <span className="lg:hidden text-sm font-medium">{item.company.split(' (')[0]}</span>
-                    <span className="hidden lg:block text-[17px] font-semibold">{item.company}</span>
-                    <span className="hidden lg:block font-mono text-[13px] text-muted">{item.period}</span>
-                  </button>
-                );
-              })}
-            </div>
-            <article aria-live="polite" className="mx-5 lg:mx-0 lg:min-h-[620px] flex flex-col gap-2.5 lg:gap-3.5 p-6 lg:p-0 rounded-2xl lg:rounded-none bg-surface lg:bg-transparent border border-line lg:border-0">
-              <div className="flex lg:hidden items-center justify-between gap-3 font-mono text-xs text-muted">
-                <span>{job.period}</span>
-                {job.current && <span className="px-2.5 rounded-full border border-accent text-accent">{t.experience.currentBadge}</span>}
-              </div>
-              <div className="flex items-center gap-3">
-                <h3 className="m-0 font-serif font-normal text-[28px] lg:text-[40px] leading-[1.15] tracking-[-0.01em]">{job.company}</h3>
-                {job.current && (
-                  <span className="hidden lg:inline px-2.5 py-0.5 rounded-full border border-accent text-accent font-mono text-xs">{t.experience.currentBadge}</span>
-                )}
-              </div>
-              <p className="m-0 text-[15px] lg:text-[17px] font-medium">
-                {job.role}{' '}
-                <span className="font-normal text-muted">
-                  <span className="hidden lg:inline">· {job.period} </span>· {job.location}
-                </span>
-              </p>
-              {job.context && <p className="m-0 text-sm lg:text-base leading-normal text-muted">{job.context}</p>}
-              <ul className="mt-1.5 lg:mt-2.5 mb-0 pl-[18px] lg:pl-5 flex flex-col gap-2.5 lg:gap-3 text-[15px] lg:text-base leading-normal list-disc">
-                {job.highlights.map((highlight) => (
-                  <li key={highlight}>{highlight}</li>
-                ))}
-              </ul>
-            </article>
-          </div>
-          <div className="lg:hidden flex items-center justify-between px-5 mt-4">
-            <RoundButton label={t.experience.previous} onClick={prevJob}><ArrowLeft size={16} aria-hidden="true" /></RoundButton>
-            <span className="font-mono text-[13px] text-muted">{jobPosition}</span>
-            <RoundButton label={t.experience.next} onClick={nextJob}><ArrowRight size={16} aria-hidden="true" /></RoundButton>
+        <section id="experience" className={`${sectionOffset} py-20 sm:py-32`}>
+          <div className={container}>
+            <SectionTitle eyebrow={t.experience.title}>{t.experience.headline}</SectionTitle>
+            <Experience />
           </div>
         </section>
 
         {/* Skills */}
-        <section id="skills" className={`${container} scroll-mt-[68px] lg:scroll-mt-[100px] grid gap-6 lg:gap-16 lg:grid-cols-[280px_minmax(0,1fr)] py-10 lg:py-16`}>
-          <SectionLabel>{t.skills.title}</SectionLabel>
-          <div className="grid gap-x-12 gap-y-7 lg:gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {t.skills.groups.map((group) => {
+        <section id="skills" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
+          <div className={container}>
+          <SectionTitle eyebrow={t.skills.title}>{t.skills.headline}</SectionTitle>
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {t.skills.groups.map((group, index) => {
               const [name, qualifier] = group.title.split(' (');
               return (
-                <div key={group.title} className="flex flex-col gap-2 lg:gap-3">
-                  <h3 className="m-0 text-base font-semibold">
+                <Reveal
+                  key={group.title}
+                  delay={(index % 3) * 90}
+                  className={`flex flex-col gap-4 p-6 sm:p-8 rounded-[28px] bg-card ${
+                    index === 0 ? 'lg:col-span-2' : ''
+                  }`}
+                >
+                  <h3 className="m-0 text-[1.1875rem] sm:text-[1.3125rem] font-semibold tracking-[-0.01em]">
                     {name}
                     {qualifier && <span className="font-normal text-muted"> ({qualifier}</span>}
                   </h3>
-                  <p className="m-0 text-[15px] lg:text-base leading-[1.8] text-muted">{group.items.join(' · ')}</p>
-                </div>
+                  <ul className="m-0 p-0 list-none flex flex-wrap gap-2">
+                    {group.items.map((item) => (
+                      <li key={item} className="px-3 py-1.5 rounded-full bg-alt text-[0.875rem] font-medium">{item}</li>
+                    ))}
+                  </ul>
+                </Reveal>
               );
             })}
+          </div>
           </div>
         </section>
 
         {/* Portfolio */}
-        <section id="portfolio" className={`${container} scroll-mt-[68px] lg:scroll-mt-[100px] grid gap-4 lg:gap-16 lg:grid-cols-[280px_minmax(0,1fr)] py-10 lg:py-16`}>
-          <div className="flex lg:flex-col items-baseline lg:items-start justify-between lg:justify-start gap-3">
-            <SectionLabel>{t.portfolio.title}</SectionLabel>
-            <span className="text-[13px] lg:text-sm text-muted">{t.portfolio.note}</span>
-          </div>
-          <div>
-            <div className="grid gap-6 sm:grid-cols-2">
-              {projects.map((project, index) => (
-                <article
-                  key={project.name}
-                  className={`${index === projectIndex ? 'flex' : 'hidden sm:flex'} flex-col gap-3 lg:gap-4 p-6 lg:p-8 rounded-2xl bg-surface border border-line`}
-                >
-                  <h3 className="m-0 font-serif font-medium text-[28px] lg:text-[30px]">{project.name}</h3>
-                  <p className="m-0 text-[15px] lg:text-base leading-normal text-muted">{project.summary}</p>
-                  <ul className="m-0 p-0 list-none flex flex-wrap gap-1.5 lg:gap-2 font-mono text-xs">
+        <section id="portfolio" className={`${sectionOffset} py-20 sm:py-32`}>
+          <div className={container}>
+            <SectionTitle eyebrow={t.portfolio.title}>{t.portfolio.note}</SectionTitle>
+            <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+              {t.portfolio.items.map((project, index) => (
+                <Reveal key={project.name} delay={index * 90} className="flex flex-col gap-4 p-7 sm:p-10 rounded-[28px] bg-alt">
+                  <h3 className="m-0 text-[1.625rem] sm:text-[2rem] font-semibold tracking-[-0.02em]">{project.name}</h3>
+                  <p className="m-0 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted">{project.summary}</p>
+                  <ul className="mt-auto pt-2 mb-0 p-0 list-none flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
-                      <li key={tag} className="px-2.5 py-1 rounded-md bg-paper">{tag}</li>
+                      <li key={tag} className="px-3 py-1 rounded-full bg-card text-[0.8125rem] font-medium">{tag}</li>
                     ))}
                   </ul>
-                </article>
+                </Reveal>
               ))}
-            </div>
-            <div className="sm:hidden flex items-center justify-between mt-4">
-              <RoundButton label={t.portfolio.previous} onClick={prevProject}><ArrowLeft size={16} aria-hidden="true" /></RoundButton>
-              <div className="flex items-center">
-                {projects.map((project, index) => (
-                  <button
-                    key={project.name}
-                    type="button"
-                    aria-label={`${t.portfolio.goTo}: ${project.name}`}
-                    aria-current={index === projectIndex ? 'true' : undefined}
-                    onClick={() => setProjectIndex(index)}
-                    className="w-8 h-11 flex items-center justify-center"
-                  >
-                    <span className={`h-1.5 rounded-full transition-all ${index === projectIndex ? 'w-5 bg-accent' : 'w-1.5 bg-line'}`} />
-                  </button>
-                ))}
-              </div>
-              <RoundButton label={t.portfolio.next} onClick={nextProject}><ArrowRight size={16} aria-hidden="true" /></RoundButton>
             </div>
           </div>
         </section>
 
         {/* Education */}
-        <section id="education" className={`${container} scroll-mt-[68px] lg:scroll-mt-[100px] grid gap-6 lg:gap-16 lg:grid-cols-[280px_minmax(0,1fr)] pt-10 pb-16 lg:pt-16 lg:pb-[120px]`}>
-          <SectionLabel>{t.education.title}</SectionLabel>
-          <div className="grid gap-7 lg:gap-12 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
-              <h3 className="m-0 text-lg lg:text-xl font-semibold">{t.education.degree}</h3>
-              <span className="text-base text-muted">{t.education.school} · {t.education.year}</span>
-              {t.education.courses.map(({ name, school, year }) => (
-                <div key={name} className="flex flex-col gap-1.5 mt-4">
-                  <h3 className="m-0 text-lg lg:text-xl font-semibold">{name}</h3>
-                  <span className="text-base text-muted">{school} · {year}</span>
+        <section id="education" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
+          <div className={container}>
+          <SectionTitle eyebrow={t.education.title}>{t.education.degree}.</SectionTitle>
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
+            <Reveal className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-card">
+              <h3 className="m-0 text-[1.1875rem] font-semibold">{t.education.degree}</h3>
+              <span className="text-[0.9375rem] text-muted">{t.education.school}</span>
+              <span className="mt-3 text-[1.75rem] font-semibold tracking-[-0.02em]">{t.education.year}</span>
+            </Reveal>
+            {t.education.courses.map(({ name, school, year }) => (
+              <Reveal key={name} delay={90} className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-card">
+                <h3 className="m-0 text-[1.1875rem] font-semibold">{name}</h3>
+                <span className="text-[0.9375rem] text-muted">{school}</span>
+                <span className="mt-3 text-[1.75rem] font-semibold tracking-[-0.02em]">{year}</span>
+              </Reveal>
+            ))}
+            <Reveal delay={180} className="flex flex-col gap-3 p-6 sm:p-8 rounded-[28px] bg-card">
+              <h3 className="m-0 text-[1.1875rem] font-semibold">{t.education.languagesTitle}</h3>
+              {t.education.languages.map(({ name, level }) => (
+                <div key={name} className="flex flex-col">
+                  <span className="text-[1.0625rem] font-medium">{name}</span>
+                  <span className="text-[0.9375rem] text-muted">{level}</span>
                 </div>
               ))}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <h3 className="m-0 text-lg lg:text-xl font-semibold">{t.education.languagesTitle}</h3>
-              {t.education.languages.map(({ name, level }) => (
-                <span key={name} className="text-base text-muted">{name}: {level}</span>
-              ))}
-            </div>
+            </Reveal>
+          </div>
           </div>
         </section>
       </main>
 
-      <footer id="contact" className="scroll-mt-[68px] lg:scroll-mt-[100px] bg-forest text-forest-text">
-        <div className={`${container} flex flex-col gap-14 lg:gap-16 pt-16 lg:pt-[120px] pb-8 lg:pb-12`}>
-          <div className="flex flex-col gap-6 lg:gap-7">
-            <h2 className="m-0 font-serif font-normal text-5xl lg:text-[88px] leading-none tracking-[-0.02em]">{t.contact.title}</h2>
-            <p className="m-0 max-w-[560px] text-base lg:text-[19px] text-forest-muted">{t.contact.description}</p>
-            <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-10 pt-3 text-lg lg:text-xl">
-              <a href={`mailto:${contactLinks.email}`} className="self-start flex items-center gap-2.5 pb-1 border-b border-forest-muted hover:opacity-80 break-all">
-                {contactLinks.email}
-                <ArrowUpRight size={16} className="shrink-0" aria-hidden="true" />
-              </a>
-              <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="self-start pb-1 hover:opacity-80">LinkedIn</a>
-              <a href={contactLinks.github} target="_blank" rel="noreferrer" className="self-start pb-1 hover:opacity-80">GitHub</a>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 pt-7 border-t border-forest-line font-mono text-xs lg:text-[13px] text-forest-muted">
+      {/* Contact */}
+      <footer id="contact" className={`${sectionOffset} bg-black text-[#f5f5f7]`}>
+        <div className={`${container} flex flex-col items-center text-center gap-6 pt-24 sm:pt-36 pb-10`}>
+          <Reveal>
+            <h2 className="m-0 text-[3rem] sm:text-[5rem] lg:text-[6rem] font-bold leading-[1] tracking-[-0.04em] text-gradient">{t.contact.title}</h2>
+          </Reveal>
+          <Reveal delay={100}>
+            <p className="m-0 max-w-[35rem] text-[1.1875rem] sm:text-[1.3125rem] leading-[1.45] text-[#a1a1a6]">{t.contact.description}</p>
+          </Reveal>
+          <Reveal delay={200} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 pt-4">
+            <a
+              href={`mailto:${contactLinks.email}`}
+              className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-[#2997ff] hover:bg-[#40a3ff] text-white text-[1.0625rem] font-medium transition-[transform,background-color] duration-100 ease-out active:scale-[0.97] break-all"
+            >
+              {contactLinks.email}
+              <ArrowUpRight size={16} className="shrink-0" aria-hidden="true" />
+            </a>
+            <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-[#2997ff] hover:underline">
+              LinkedIn
+              <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            </a>
+            <a href={contactLinks.github} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-[#2997ff] hover:underline">
+              GitHub
+              <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            </a>
+          </Reveal>
+          <div className="w-full flex flex-col sm:flex-row sm:justify-between gap-2 mt-20 sm:mt-28 pt-6 border-t border-[#424245] text-xs text-[#86868b]">
             <span>© {CURRENT_YEAR} James Almeida</span>
             <span>{t.contact.footer}</span>
           </div>

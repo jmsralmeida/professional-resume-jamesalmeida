@@ -1,29 +1,26 @@
 /** @type {import('tailwindcss').Config} */
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
-      screens: {
-        'xs': '475px',    /* Extra small devices */
-        'mobile': '480px', /* Mobile específico */
-        'tablet': '768px', /* Tablet */
-        'desktop': '1024px', /* Desktop */
-        'wide': '1440px',  /* Wide screens */
-      },
       colors: {
-        /* "Floresta" palette from the site redesign */
-        paper: '#F3F1EC',
-        surface: '#FBFAF7',
-        ink: '#17201B',
-        muted: '#56605A',
-        line: '#D9D6CD',
-        accent: { DEFAULT: '#1E5B45', hover: '#174736' },
-        forest: { DEFAULT: '#16231D', text: '#F3F1EC', muted: '#A9B5AE', line: '#2E3C35' },
+        /* Apple-inspired tokens; values live in src/index.css (light and dark) */
+        canvas: token('canvas'),
+        alt: token('alt'),
+        card: token('card'),
+        ink: token('ink'),
+        muted: token('muted'),
+        line: token('line'),
+        accent: { DEFAULT: token('accent'), hover: token('accent-hover') },
       },
       fontFamily: {
-        serif: ['Newsreader', 'Georgia', 'serif'],
-        sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'Inter', 'system-ui', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+      },
+      transitionTimingFunction: {
+        apple: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+        spring: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
     },
   },

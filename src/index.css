@@ -2,7 +2,127 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --canvas: 255 255 255;
+  --alt: 245 245 247;
+  --card: 255 255 255;
+  --ink: 29 29 31;
+  --muted: 110 110 115;
+  --line: 210 210 215;
+  --accent: 0 113 227;
+  --accent-hover: 0 119 237;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: 0 0 0;
+    --alt: 16 16 18;
+    --card: 29 29 31;
+    --ink: 245 245 247;
+    --muted: 161 161 166;
+    --line: 66 66 69;
+    --accent: 41 151 255;
+    --accent-hover: 64 163 255;
+    color-scheme: dark;
+  }
+}
+
 html { scroll-behavior: smooth; }
-body { -webkit-font-smoothing: antialiased; }
+body {
+  background: rgb(var(--canvas));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern';
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em; /* body size: a touch tight; small text opens up below */
+}
+/* Tracking is size-specific: large type is tightened per element, small type gets a little air */
+.text-xs, .text-sm, .text-\[0\.8125rem\], .text-\[0\.875rem\] { letter-spacing: 0.003em; }
 p { text-wrap: pretty; }
 h1, h2, h3 { text-wrap: balance; }
+::selection { background: rgb(var(--accent) / 0.25); }
+
+@layer components {
+  /* Gradient headline text, like Apple product pages */
+  .text-gradient {
+    background: linear-gradient(90deg, rgb(var(--accent)) 0%, #8a5cf6 55%, #e0457b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Scroll reveal: elements fade and rise once they enter the viewport */
+  .reveal {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal[data-visible='true'] { opacity: 1; transform: none; }
+
+  .reveal-scale { opacity: 0; transform: scale(0.94); }
+  .reveal-scale[data-visible='true'] { opacity: 1; transform: none; }
+
+  /* Translucent nav: content scrolls under a blurred material, with a soft edge instead of a divider */
+  .nav-material {
+    transition: background-color 0.4s ease, backdrop-filter 0.4s ease;
+  }
+  .nav-material::after {
+    content: '';
+    position: absolute;
+    inset: 100% 0 auto;
+    height: 16px;
+    pointer-events: none;
+    background: linear-gradient(rgb(var(--ink) / 0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .nav-material[data-material='on'] {
+    background: rgb(var(--canvas) / 0.72);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+  .nav-material[data-material='on']::after { opacity: 1; }
+
+  /* Mobile menu sheet: a heavier, near-solid layer so it never stacks glass on glass */
+  .menu-sheet {
+    background: rgb(var(--canvas));
+    box-shadow: 0 24px 40px -24px rgb(0 0 0 / 0.25);
+  }
+
+  /* Panel swap when switching experiences */
+  .panel-enter { animation: panel-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes panel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Reduced motion keeps gentle cross-fades instead of movement */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .reveal-scale { transform: none; transition: opacity 0.2s ease; transition-delay: 0ms; }
+  .panel-enter { animation: panel-fade 0.2s ease both; }
+  .menu-sheet { transform: none !important; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav-material[data-material='on'] {
+    background: rgb(var(--canvas));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .nav-material[data-material='on'] { background: rgb(var(--canvas)); border-bottom: 1px solid rgb(var(--ink)); }
+  .nav-material::after { display: none; }
+  .menu-sheet { background: rgb(var(--canvas)); border-bottom: 1px solid rgb(var(--ink)); }
+}
