@@ -34,7 +34,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern';
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em; /* body size: a touch tight; small text opens up below */
 }
+/* Tracking is size-specific: large type is tightened per element, small type gets a little air */
+.text-xs, .text-sm, .text-\[0\.8125rem\], .text-\[0\.875rem\] { letter-spacing: 0.003em; }
 p { text-wrap: pretty; }
 h1, h2, h3 { text-wrap: balance; }
 ::selection { background: rgb(var(--accent) / 0.25); }
@@ -60,6 +64,33 @@ h1, h2, h3 { text-wrap: balance; }
   .reveal-scale { opacity: 0; transform: scale(0.94); }
   .reveal-scale[data-visible='true'] { opacity: 1; transform: none; }
 
+  /* Translucent nav: content scrolls under a blurred material, with a soft edge instead of a divider */
+  .nav-material {
+    transition: background-color 0.4s ease, backdrop-filter 0.4s ease;
+  }
+  .nav-material::after {
+    content: '';
+    position: absolute;
+    inset: 100% 0 auto;
+    height: 16px;
+    pointer-events: none;
+    background: linear-gradient(rgb(var(--ink) / 0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .nav-material[data-material='on'] {
+    background: rgb(var(--canvas) / 0.72);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+  .nav-material[data-material='on']::after { opacity: 1; }
+
+  /* Mobile menu sheet: a heavier, near-solid layer so it never stacks glass on glass */
+  .menu-sheet {
+    background: rgb(var(--canvas));
+    box-shadow: 0 24px 40px -24px rgb(0 0 0 / 0.25);
+  }
+
   /* Panel swap when switching experiences */
   .panel-enter { animation: panel-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
 }
@@ -69,8 +100,29 @@ h1, h2, h3 { text-wrap: balance; }
   to { opacity: 1; transform: none; }
 }
 
+@keyframes panel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Reduced motion keeps gentle cross-fades instead of movement */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .reveal, .reveal-scale { opacity: 1; transform: none; transition: none; }
-  .panel-enter { animation: none; }
+  .reveal, .reveal-scale { transform: none; transition: opacity 0.2s ease; transition-delay: 0ms; }
+  .panel-enter { animation: panel-fade 0.2s ease both; }
+  .menu-sheet { transform: none !important; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav-material[data-material='on'] {
+    background: rgb(var(--canvas));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .nav-material[data-material='on'] { background: rgb(var(--canvas)); border-bottom: 1px solid rgb(var(--ink)); }
+  .nav-material::after { display: none; }
+  .menu-sheet { background: rgb(var(--canvas)); border-bottom: 1px solid rgb(var(--ink)); }
 }

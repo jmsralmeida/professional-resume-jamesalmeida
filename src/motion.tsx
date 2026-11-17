@@ -12,7 +12,7 @@ export function useInView<T extends Element>(threshold = 0.15) {
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
+    if (!('IntersectionObserver' in window)) {
       setInView(true);
       return;
     }

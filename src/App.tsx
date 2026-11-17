@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, type KeyboardEvent, type ReactNode } from 'react';
 import { ArrowUpRight, ChevronRight, Menu, X } from 'lucide-react';
 
 import profileImage from './assets/images/profile.jpg';
@@ -8,18 +8,18 @@ import { CountUp, Reveal, useActiveSection, useInView, useScrollProgress, useScr
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-const container = 'max-w-[1160px] mx-auto px-5 sm:px-8';
+const container = 'max-w-[72.5rem] mx-auto px-5 sm:px-8';
 const sectionOffset = 'scroll-mt-14';
 
 function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="m-0 text-[15px] sm:text-[17px] font-semibold text-accent">{children}</p>;
+  return <p className="m-0 text-[0.9375rem] sm:text-[1.0625rem] font-semibold text-accent">{children}</p>;
 }
 
 function SectionTitle({ eyebrow, children }: { eyebrow: string; children: ReactNode }) {
   return (
     <Reveal className="flex flex-col gap-2 sm:gap-3 mb-10 sm:mb-14">
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="m-0 text-[34px] sm:text-[48px] lg:text-[56px] font-semibold leading-[1.07] tracking-[-0.025em]">{children}</h2>
+      <h2 className="m-0 text-[2.125rem] sm:text-[3rem] lg:text-[3.5rem] font-semibold leading-[1.07] tracking-[-0.025em]">{children}</h2>
     </Reveal>
   );
 }
@@ -61,7 +61,7 @@ function ScrollLitText({ text }: { text: string }) {
   const lit = progress * words.length * 1.15;
 
   return (
-    <p ref={ref} className="m-0 text-[26px] sm:text-[36px] lg:text-[44px] font-semibold leading-[1.18] tracking-[-0.02em]">
+    <p ref={ref} className="m-0 text-[1.625rem] sm:text-[2.25rem] lg:text-[2.75rem] font-semibold leading-[1.18] tracking-[-0.02em]">
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">
         {words.map((word, index) => (
@@ -82,10 +82,10 @@ function Highlights() {
     <dl ref={ref} className="m-0 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {t.highlights.map(({ value, label }, index) => (
         <Reveal key={label} delay={index * 90} className="flex flex-col gap-2 p-5 sm:p-7 rounded-[22px] sm:rounded-[28px] bg-card">
-          <dd className="m-0 order-1 text-[28px] sm:text-[36px] font-semibold leading-[1.05] tracking-[-0.03em] text-gradient">
+          <dd className="m-0 order-1 text-[1.75rem] sm:text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.03em] text-gradient">
             <CountUp value={value} active={inView} />
           </dd>
-          <dt className="order-2 text-sm sm:text-[15px] leading-snug text-muted">{label}</dt>
+          <dt className="order-2 text-sm sm:text-[0.9375rem] leading-snug text-muted">{label}</dt>
         </Reveal>
       ))}
     </dl>
@@ -97,6 +97,19 @@ function Experience() {
   const [jobIndex, setJobIndex] = useState(0);
   const jobs = t.experience.items;
   const job = jobs[jobIndex];
+
+  // Arrow keys move between roles, like a native segmented control
+  const onTabKey = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const forward = event.key === 'ArrowRight' || event.key === 'ArrowDown';
+    const back = event.key === 'ArrowLeft' || event.key === 'ArrowUp';
+    if (!forward && !back) return;
+    event.preventDefault();
+    const next = (index + (forward ? 1 : -1) + jobs.length) % jobs.length;
+    setJobIndex(next);
+    const tab = document.getElementById(`job-tab-${next}`);
+    tab?.focus();
+    tab?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  };
 
   return (
     <div className="grid gap-6 lg:gap-12 grid-cols-[minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)] items-start">
@@ -110,16 +123,20 @@ function Experience() {
                 type="button"
                 role="tab"
                 aria-selected={active}
+                id={`job-tab-${index}`}
+                aria-controls="job-panel"
+                tabIndex={active ? 0 : -1}
                 onClick={() => setJobIndex(index)}
-                className={`shrink-0 flex flex-col items-start gap-0.5 px-4 py-2.5 lg:px-5 lg:py-4 rounded-full lg:rounded-2xl text-left whitespace-nowrap lg:whitespace-normal transition-all duration-300 ease-spring ${
+                onKeyDown={(event) => onTabKey(event, index)}
+                className={`shrink-0 flex flex-col items-start gap-0.5 px-4 py-2.5 lg:px-5 lg:py-4 rounded-full lg:rounded-2xl text-left whitespace-nowrap lg:whitespace-normal transition-[transform,background-color,color,box-shadow] duration-300 ease-spring active:scale-[0.97] active:duration-100 ${
                   active ? 'bg-ink text-canvas lg:bg-card lg:text-ink lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]' : 'bg-card lg:bg-transparent text-muted hover:text-ink'
                 }`}
               >
-                <span className="text-[15px] lg:text-[17px] font-semibold">
+                <span className="text-[0.9375rem] lg:text-[1.0625rem] font-semibold">
                   <span className="lg:hidden">{item.company.split(' (')[0]}</span>
                   <span className="hidden lg:inline">{item.company}</span>
                 </span>
-                <span className="hidden lg:block text-[13px] text-muted">{item.period}</span>
+                <span className="hidden lg:block text-[0.8125rem] text-muted">{item.period}</span>
               </button>
             );
           })}
@@ -127,8 +144,8 @@ function Experience() {
       </Reveal>
 
       <Reveal>
-        <article key={`${t.meta.title}-${jobIndex}`} role="tabpanel" className="panel-enter p-6 sm:p-10 rounded-[28px] bg-card">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-2 text-[13px] sm:text-sm text-muted">
+        <article key={`${t.meta.title}-${jobIndex}`} id="job-panel" role="tabpanel" aria-labelledby={`job-tab-${jobIndex}`} className="panel-enter p-6 sm:p-10 rounded-[28px] bg-card">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-2 text-[0.8125rem] sm:text-sm text-muted">
             <span>{job.period}</span>
             <span aria-hidden="true">·</span>
             <span>{job.location}</span>
@@ -136,10 +153,10 @@ function Experience() {
               <span className="px-2.5 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">{t.experience.currentBadge}</span>
             )}
           </div>
-          <h3 className="m-0 text-[26px] sm:text-[34px] font-semibold leading-[1.12] tracking-[-0.02em]">{job.company}</h3>
-          <p className="mt-1 mb-0 text-[17px] sm:text-[19px] font-medium text-muted">{job.role}</p>
-          {job.context && <p className="mt-5 mb-0 text-[15px] sm:text-[17px] leading-relaxed text-muted">{job.context}</p>}
-          <ul className="mt-6 mb-0 p-0 list-none flex flex-col gap-4 text-[15px] sm:text-[17px] leading-relaxed">
+          <h3 className="m-0 text-[1.625rem] sm:text-[2.125rem] font-semibold leading-[1.12] tracking-[-0.02em]">{job.company}</h3>
+          <p className="mt-1 mb-0 text-[1.0625rem] sm:text-[1.1875rem] font-medium text-muted">{job.role}</p>
+          {job.context && <p className="mt-5 mb-0 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted">{job.context}</p>}
+          <ul className="mt-6 mb-0 p-0 list-none flex flex-col gap-4 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed">
             {job.highlights.map((highlight) => (
               <li key={highlight} className="relative pl-5">
                 <span aria-hidden="true" className="absolute left-0 top-[0.62em] w-1.5 h-1.5 rounded-full bg-accent" />
@@ -149,10 +166,10 @@ function Experience() {
           </ul>
           {job.stack && (
             <div className="mt-8 pt-6 border-t border-line">
-              <h4 className="m-0 mb-3 text-[13px] font-semibold text-muted">{t.experience.stackLabel}</h4>
+              <h4 className="m-0 mb-3 text-[0.8125rem] font-semibold text-muted">{t.experience.stackLabel}</h4>
               <ul className="m-0 p-0 list-none flex flex-wrap gap-2">
                 {job.stack.map((tag) => (
-                  <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[13px] font-medium">{tag}</li>
+                  <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[0.8125rem] font-medium">{tag}</li>
                 ))}
               </ul>
             </div>
@@ -179,22 +196,21 @@ function App() {
   const [firstParagraph, ...otherParagraphs] = t.about.paragraphs;
 
   return (
-    <div className="min-h-screen bg-canvas text-ink font-sans text-[17px] leading-normal">
+    <div className="min-h-screen bg-canvas text-ink font-sans text-[1.0625rem] leading-normal">
       {/* Frosted glass navigation */}
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
-          scrolled || menuOpen ? 'bg-canvas/75 backdrop-blur-xl backdrop-saturate-150 border-b border-line/60' : 'bg-transparent border-b border-transparent'
-        }`}
+        data-material={scrolled || menuOpen ? 'on' : 'off'}
+        className="nav-material fixed inset-x-0 top-0 z-50"
       >
         <div className={`${container} h-14 flex items-center justify-between gap-4`}>
-          <a href="#top" className="text-[17px] font-semibold tracking-[-0.01em]">James Almeida</a>
-          <nav className="hidden md:flex items-center gap-7 text-[13px]">
+          <a href="#top" className="text-[1.0625rem] font-semibold tracking-[-0.01em]">James Almeida</a>
+          <nav className="hidden md:flex items-center gap-7 text-[0.8125rem]">
             {navItems.map(({ id, label }) => (
               <a
                 key={id}
                 href={`#${id}`}
                 aria-current={activeSection === id ? 'true' : undefined}
-                className={`transition-colors ${activeSection === id ? 'text-ink' : 'text-muted hover:text-ink'}`}
+                className={`font-medium transition-colors ${activeSection === id ? 'text-ink' : 'text-ink/65 hover:text-ink'}`}
               >
                 {label}
               </a>
@@ -215,7 +231,9 @@ function App() {
           </div>
         </div>
         <nav
-          className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-500 ease-spring ${menuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'}`}
+          className={`menu-sheet md:hidden absolute inset-x-0 top-full origin-top transition-[opacity,transform,visibility] duration-300 ease-spring ${
+            menuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-3 invisible'
+          }`}
           aria-hidden={!menuOpen}
         >
           <div className="flex flex-col px-5 pb-6 pt-1">
@@ -225,7 +243,7 @@ function App() {
                 href={`#${id}`}
                 tabIndex={menuOpen ? 0 : -1}
                 onClick={() => setMenuOpen(false)}
-                className="py-3 text-[24px] font-semibold tracking-[-0.01em] border-b border-line/60 last:border-0"
+                className="py-3 text-[1.5rem] font-semibold tracking-[-0.01em] border-b border-line/60 last:border-0"
               >
                 {label}
               </a>
@@ -239,7 +257,7 @@ function App() {
         <section className={`${container} grid gap-10 lg:gap-16 lg:grid-cols-[minmax(0,1fr)_380px] items-center pt-24 pb-16 sm:pt-32 lg:pt-40 lg:pb-28`}>
           <div className="flex flex-col gap-5 sm:gap-6 order-2 lg:order-1">
             <Reveal>
-              <p className="m-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-alt text-[13px] sm:text-sm font-medium text-muted">
+              <p className="m-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl sm:rounded-full bg-alt text-[0.8125rem] sm:text-sm font-medium text-muted">
                 <span className="relative flex w-2 h-2" aria-hidden="true">
                   <span className="absolute inset-0 rounded-full bg-[#30d158] animate-ping opacity-60 motion-reduce:animate-none" />
                   <span className="relative w-2 h-2 rounded-full bg-[#30d158]" />
@@ -248,27 +266,27 @@ function App() {
               </p>
             </Reveal>
             <Reveal delay={80}>
-              <h1 className="m-0 text-[40px] sm:text-[56px] lg:text-[64px] font-bold leading-[1.05] tracking-[-0.035em]">
+              <h1 className="m-0 text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem] font-bold leading-[1.05] tracking-[-0.035em]">
                 {t.hero.titleStart}
                 <span className="text-gradient">{t.hero.titleAccent}</span>
                 {t.hero.titleEnd}
               </h1>
             </Reveal>
             <Reveal delay={160}>
-              <p className="m-0 max-w-[600px] text-[19px] sm:text-[21px] leading-[1.45] text-muted">{t.hero.subtitle}</p>
+              <p className="m-0 max-w-[37.5rem] text-[1.1875rem] sm:text-[1.3125rem] leading-[1.45] text-muted">{t.hero.subtitle}</p>
             </Reveal>
             <Reveal delay={240} className="flex flex-wrap items-center gap-x-5 sm:gap-x-6 gap-y-4 pt-2">
               <a
                 href={`mailto:${contactLinks.email}`}
-                className="inline-flex items-center justify-center h-12 px-6 rounded-full bg-accent hover:bg-accent-hover text-white text-[17px] font-medium transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                className="inline-flex items-center justify-center h-12 px-6 rounded-full bg-accent hover:bg-accent-hover text-white text-[1.0625rem] font-medium transition-[transform,background-color] duration-100 ease-out active:scale-[0.97]"
               >
                 {t.hero.ctaEmail}
               </a>
-              <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[17px] text-accent hover:underline">
+              <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-accent hover:underline">
                 LinkedIn
                 <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </a>
-              <a href={contactLinks.github} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[17px] text-accent hover:underline">
+              <a href={contactLinks.github} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-accent hover:underline">
                 GitHub
                 <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </a>
@@ -297,11 +315,11 @@ function App() {
           <Reveal className="mb-6 sm:mb-8">
             <Eyebrow>{t.about.title}</Eyebrow>
           </Reveal>
-          <div className="flex flex-col gap-8 max-w-[920px]">
+          <div className="flex flex-col gap-8 max-w-[57.5rem]">
             <ScrollLitText text={firstParagraph} />
             {otherParagraphs.map((paragraph) => (
               <Reveal key={paragraph}>
-                <p className="m-0 max-w-[720px] text-[17px] sm:text-[21px] leading-[1.5] text-muted">{paragraph}</p>
+                <p className="m-0 max-w-[45rem] text-[1.0625rem] sm:text-[1.3125rem] leading-[1.5] text-muted">{paragraph}</p>
               </Reveal>
             ))}
           </div>
@@ -325,17 +343,17 @@ function App() {
                 <Reveal
                   key={group.title}
                   delay={(index % 3) * 90}
-                  className={`flex flex-col gap-4 p-6 sm:p-8 rounded-[28px] bg-alt transition-transform duration-500 ease-spring hover:scale-[1.015] ${
+                  className={`flex flex-col gap-4 p-6 sm:p-8 rounded-[28px] bg-alt ${
                     index === 0 ? 'lg:col-span-2' : ''
                   }`}
                 >
-                  <h3 className="m-0 text-[19px] sm:text-[21px] font-semibold tracking-[-0.01em]">
+                  <h3 className="m-0 text-[1.1875rem] sm:text-[1.3125rem] font-semibold tracking-[-0.01em]">
                     {name}
                     {qualifier && <span className="font-normal text-muted"> ({qualifier}</span>}
                   </h3>
                   <ul className="m-0 p-0 list-none flex flex-wrap gap-2">
                     {group.items.map((item) => (
-                      <li key={item} className="px-3 py-1.5 rounded-full bg-card text-[14px] font-medium">{item}</li>
+                      <li key={item} className="px-3 py-1.5 rounded-full bg-card text-[0.875rem] font-medium">{item}</li>
                     ))}
                   </ul>
                 </Reveal>
@@ -351,11 +369,11 @@ function App() {
             <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
               {t.portfolio.items.map((project, index) => (
                 <Reveal key={project.name} delay={index * 90} className="flex flex-col gap-4 p-7 sm:p-10 rounded-[28px] bg-card">
-                  <h3 className="m-0 text-[26px] sm:text-[32px] font-semibold tracking-[-0.02em]">{project.name}</h3>
-                  <p className="m-0 text-[15px] sm:text-[17px] leading-relaxed text-muted">{project.summary}</p>
+                  <h3 className="m-0 text-[1.625rem] sm:text-[2rem] font-semibold tracking-[-0.02em]">{project.name}</h3>
+                  <p className="m-0 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted">{project.summary}</p>
                   <ul className="mt-auto pt-2 mb-0 p-0 list-none flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
-                      <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[13px] font-medium">{tag}</li>
+                      <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[0.8125rem] font-medium">{tag}</li>
                     ))}
                   </ul>
                 </Reveal>
@@ -369,23 +387,23 @@ function App() {
           <SectionTitle eyebrow={t.education.title}>{t.education.degree}.</SectionTitle>
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
             <Reveal className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-alt">
-              <h3 className="m-0 text-[19px] font-semibold">{t.education.degree}</h3>
-              <span className="text-[15px] text-muted">{t.education.school}</span>
-              <span className="mt-3 text-[28px] font-semibold tracking-[-0.02em]">{t.education.year}</span>
+              <h3 className="m-0 text-[1.1875rem] font-semibold">{t.education.degree}</h3>
+              <span className="text-[0.9375rem] text-muted">{t.education.school}</span>
+              <span className="mt-3 text-[1.75rem] font-semibold tracking-[-0.02em]">{t.education.year}</span>
             </Reveal>
             {t.education.courses.map(({ name, school, year }) => (
               <Reveal key={name} delay={90} className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-alt">
-                <h3 className="m-0 text-[19px] font-semibold">{name}</h3>
-                <span className="text-[15px] text-muted">{school}</span>
-                <span className="mt-3 text-[28px] font-semibold tracking-[-0.02em]">{year}</span>
+                <h3 className="m-0 text-[1.1875rem] font-semibold">{name}</h3>
+                <span className="text-[0.9375rem] text-muted">{school}</span>
+                <span className="mt-3 text-[1.75rem] font-semibold tracking-[-0.02em]">{year}</span>
               </Reveal>
             ))}
             <Reveal delay={180} className="flex flex-col gap-3 p-6 sm:p-8 rounded-[28px] bg-alt">
-              <h3 className="m-0 text-[19px] font-semibold">{t.education.languagesTitle}</h3>
+              <h3 className="m-0 text-[1.1875rem] font-semibold">{t.education.languagesTitle}</h3>
               {t.education.languages.map(({ name, level }) => (
                 <div key={name} className="flex flex-col">
-                  <span className="text-[17px] font-medium">{name}</span>
-                  <span className="text-[15px] text-muted">{level}</span>
+                  <span className="text-[1.0625rem] font-medium">{name}</span>
+                  <span className="text-[0.9375rem] text-muted">{level}</span>
                 </div>
               ))}
             </Reveal>
@@ -397,24 +415,24 @@ function App() {
       <footer id="contact" className={`${sectionOffset} bg-black text-[#f5f5f7]`}>
         <div className={`${container} flex flex-col items-center text-center gap-6 pt-24 sm:pt-36 pb-10`}>
           <Reveal>
-            <h2 className="m-0 text-[48px] sm:text-[80px] lg:text-[96px] font-bold leading-[1] tracking-[-0.04em] text-gradient">{t.contact.title}</h2>
+            <h2 className="m-0 text-[3rem] sm:text-[5rem] lg:text-[6rem] font-bold leading-[1] tracking-[-0.04em] text-gradient">{t.contact.title}</h2>
           </Reveal>
           <Reveal delay={100}>
-            <p className="m-0 max-w-[560px] text-[19px] sm:text-[21px] leading-[1.45] text-[#a1a1a6]">{t.contact.description}</p>
+            <p className="m-0 max-w-[35rem] text-[1.1875rem] sm:text-[1.3125rem] leading-[1.45] text-[#a1a1a6]">{t.contact.description}</p>
           </Reveal>
           <Reveal delay={200} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 pt-4">
             <a
               href={`mailto:${contactLinks.email}`}
-              className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-[#2997ff] hover:bg-[#40a3ff] text-white text-[17px] font-medium transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] break-all"
+              className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-[#2997ff] hover:bg-[#40a3ff] text-white text-[1.0625rem] font-medium transition-[transform,background-color] duration-100 ease-out active:scale-[0.97] break-all"
             >
               {contactLinks.email}
               <ArrowUpRight size={16} className="shrink-0" aria-hidden="true" />
             </a>
-            <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[17px] text-[#2997ff] hover:underline">
+            <a href={contactLinks.linkedin} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-[#2997ff] hover:underline">
               LinkedIn
               <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </a>
-            <a href={contactLinks.github} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[17px] text-[#2997ff] hover:underline">
+            <a href={contactLinks.github} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-0.5 text-[1.0625rem] text-[#2997ff] hover:underline">
               GitHub
               <ChevronRight size={18} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </a>
