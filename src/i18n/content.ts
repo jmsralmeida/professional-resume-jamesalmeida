@@ -217,7 +217,7 @@ const en: Content = {
   },
   contact: {
     title: "Let's work together.",
-    description: 'Open to remote frontend and mobile engineering roles. The best way to reach me is by email or LinkedIn.',
+    description: 'Open to remote frontend, fullstack and mobile engineering roles. The best way to reach me is by email or LinkedIn.',
     footer: 'Frontend Software Engineer · São Paulo, Brazil',
   },
 };
@@ -380,7 +380,7 @@ const pt: Content = {
   },
   contact: {
     title: 'Vamos trabalhar juntos.',
-    description: 'Aberto a vagas remotas de engenharia frontend e mobile. O melhor jeito de falar comigo é por e-mail ou LinkedIn.',
+    description: 'Aberto a vagas remotas de engenharia frontend, fullstack e mobile. O melhor jeito de falar comigo é por e-mail ou LinkedIn.',
     footer: 'Engenheiro de Software Frontend · São Paulo, Brasil',
   },
 };
