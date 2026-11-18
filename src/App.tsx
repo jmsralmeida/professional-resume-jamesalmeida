@@ -129,7 +129,7 @@ function Experience() {
                 onClick={() => setJobIndex(index)}
                 onKeyDown={(event) => onTabKey(event, index)}
                 className={`shrink-0 flex flex-col items-start gap-0.5 px-4 py-2.5 lg:px-5 lg:py-4 rounded-full lg:rounded-2xl text-left whitespace-nowrap lg:whitespace-normal transition-[transform,background-color,color,box-shadow] duration-300 ease-spring active:scale-[0.97] active:duration-100 ${
-                  active ? 'bg-ink text-canvas lg:bg-alt lg:text-ink lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]' : 'bg-alt lg:bg-transparent text-muted hover:text-ink'
+                  active ? 'bg-ink text-canvas lg:bg-card lg:text-ink lg:shadow-[0_8px_30px_rgba(0,0,0,0.06)]' : 'bg-card lg:bg-transparent text-muted hover:text-ink'
                 }`}
               >
                 <span className="text-[0.9375rem] lg:text-[1.0625rem] font-semibold">
@@ -144,7 +144,7 @@ function Experience() {
       </Reveal>
 
       <Reveal>
-        <article key={`${t.meta.title}-${jobIndex}`} id="job-panel" role="tabpanel" aria-labelledby={`job-tab-${jobIndex}`} className="panel-enter p-6 sm:p-10 rounded-[28px] bg-alt">
+        <article key={`${t.meta.title}-${jobIndex}`} id="job-panel" role="tabpanel" aria-labelledby={`job-tab-${jobIndex}`} className="panel-enter p-6 sm:p-10 rounded-[28px] bg-card">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-2 text-[0.8125rem] sm:text-sm text-muted">
             <span>{job.period}</span>
             <span aria-hidden="true">·</span>
@@ -169,7 +169,7 @@ function Experience() {
               <h4 className="m-0 mb-3 text-[0.8125rem] font-semibold text-muted">{t.experience.stackLabel}</h4>
               <ul className="m-0 p-0 list-none flex flex-wrap gap-2">
                 {job.stack.map((tag) => (
-                  <li key={tag} className="px-3 py-1 rounded-full bg-card text-[0.8125rem] font-medium">{tag}</li>
+                  <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[0.8125rem] font-medium">{tag}</li>
                 ))}
               </ul>
             </div>
@@ -187,7 +187,6 @@ function App() {
 
   const navItems = [
     { id: 'about', label: t.nav.about },
-    { id: 'projects', label: t.nav.projects },
     { id: 'experience', label: t.nav.experience },
     { id: 'skills', label: t.nav.skills },
     { id: 'contact', label: t.nav.contact },
@@ -325,31 +324,8 @@ function App() {
           </div>
         </section>
 
-        {/* Key projects */}
-        <section id="projects" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
-          <div className={container}>
-            <SectionTitle eyebrow={t.projects.title}>{t.projects.headline}</SectionTitle>
-            <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
-              {t.projects.items.map((project, index) => (
-                <Reveal key={project.name} delay={index * 90} className="flex flex-col gap-4 p-7 sm:p-9 rounded-[28px] bg-card">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[0.8125rem] font-semibold text-accent">{project.company}</span>
-                    <h3 className="m-0 text-[1.5rem] sm:text-[1.75rem] font-semibold leading-[1.15] tracking-[-0.02em]">{project.name}</h3>
-                  </div>
-                  <p className="m-0 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted">{project.summary}</p>
-                  <ul className="mt-auto pt-2 mb-0 p-0 list-none flex flex-wrap gap-2">
-                    {project.stack.map((tag) => (
-                      <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[0.8125rem] font-medium">{tag}</li>
-                    ))}
-                  </ul>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Experience */}
-        <section id="experience" className={`${sectionOffset} py-20 sm:py-32`}>
+        <section id="experience" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
           <div className={container}>
             <SectionTitle eyebrow={t.experience.title}>{t.experience.headline}</SectionTitle>
             <Experience />
@@ -357,7 +333,7 @@ function App() {
         </section>
 
         {/* Skills */}
-        <section id="skills" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
+        <section id="skills" className={`${sectionOffset} py-20 sm:py-32`}>
           <div className={container}>
           <SectionTitle eyebrow={t.skills.title}>{t.skills.headline}</SectionTitle>
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -367,7 +343,7 @@ function App() {
                 <Reveal
                   key={group.title}
                   delay={(index % 3) * 90}
-                  className={`flex flex-col gap-4 p-6 sm:p-8 rounded-[28px] bg-card ${
+                  className={`flex flex-col gap-4 p-6 sm:p-8 rounded-[28px] bg-alt ${
                     index === 0 ? 'lg:col-span-2' : ''
                   }`}
                 >
@@ -377,7 +353,7 @@ function App() {
                   </h3>
                   <ul className="m-0 p-0 list-none flex flex-wrap gap-2">
                     {group.items.map((item) => (
-                      <li key={item} className="px-3 py-1.5 rounded-full bg-alt text-[0.875rem] font-medium">{item}</li>
+                      <li key={item} className="px-3 py-1.5 rounded-full bg-card text-[0.875rem] font-medium">{item}</li>
                     ))}
                   </ul>
                 </Reveal>
@@ -388,17 +364,17 @@ function App() {
         </section>
 
         {/* Portfolio */}
-        <section id="portfolio" className={`${sectionOffset} py-20 sm:py-32`}>
+        <section id="portfolio" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
           <div className={container}>
             <SectionTitle eyebrow={t.portfolio.title}>{t.portfolio.note}</SectionTitle>
             <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
               {t.portfolio.items.map((project, index) => (
-                <Reveal key={project.name} delay={index * 90} className="flex flex-col gap-4 p-7 sm:p-10 rounded-[28px] bg-alt">
+                <Reveal key={project.name} delay={index * 90} className="flex flex-col gap-4 p-7 sm:p-10 rounded-[28px] bg-card">
                   <h3 className="m-0 text-[1.625rem] sm:text-[2rem] font-semibold tracking-[-0.02em]">{project.name}</h3>
                   <p className="m-0 text-[0.9375rem] sm:text-[1.0625rem] leading-relaxed text-muted">{project.summary}</p>
                   <ul className="mt-auto pt-2 mb-0 p-0 list-none flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
-                      <li key={tag} className="px-3 py-1 rounded-full bg-card text-[0.8125rem] font-medium">{tag}</li>
+                      <li key={tag} className="px-3 py-1 rounded-full bg-alt text-[0.8125rem] font-medium">{tag}</li>
                     ))}
                   </ul>
                 </Reveal>
@@ -408,23 +384,23 @@ function App() {
         </section>
 
         {/* Education */}
-        <section id="education" className={`${sectionOffset} bg-alt py-20 sm:py-32`}>
+        <section id="education" className={`${sectionOffset} py-20 sm:py-32`}>
           <div className={container}>
           <SectionTitle eyebrow={t.education.title}>{t.education.degree}.</SectionTitle>
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
-            <Reveal className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-card">
+            <Reveal className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-alt">
               <h3 className="m-0 text-[1.1875rem] font-semibold">{t.education.degree}</h3>
               <span className="text-[0.9375rem] text-muted">{t.education.school}</span>
               <span className="mt-3 text-[1.75rem] font-semibold tracking-[-0.02em]">{t.education.year}</span>
             </Reveal>
             {t.education.courses.map(({ name, school, year }) => (
-              <Reveal key={name} delay={90} className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-card">
+              <Reveal key={name} delay={90} className="flex flex-col gap-1 p-6 sm:p-8 rounded-[28px] bg-alt">
                 <h3 className="m-0 text-[1.1875rem] font-semibold">{name}</h3>
                 <span className="text-[0.9375rem] text-muted">{school}</span>
                 <span className="mt-3 text-[1.75rem] font-semibold tracking-[-0.02em]">{year}</span>
               </Reveal>
             ))}
-            <Reveal delay={180} className="flex flex-col gap-3 p-6 sm:p-8 rounded-[28px] bg-card">
+            <Reveal delay={180} className="flex flex-col gap-3 p-6 sm:p-8 rounded-[28px] bg-alt">
               <h3 className="m-0 text-[1.1875rem] font-semibold">{t.education.languagesTitle}</h3>
               {t.education.languages.map(({ name, level }) => (
                 <div key={name} className="flex flex-col">
